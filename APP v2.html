@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Savate - Boxe française | Outil EPS</title>
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --red-border: #fca5a5;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --blue-border: #93c5fd;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --dark: #1e293b;
+    --radius: 12px;
+    --header-h: 60px;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* Barre de navigation supérieure */
+  header {
+    height: var(--header-h);
+    background: var(--dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    gap: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 20;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .brand-title {
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
+  }
+
+  .brand-sub {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.1);
+    color: #e2e8f0;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .nav-btn.active {
+    background: #38bdf8;
+    color: #0f172a;
+  }
+
+  /* Conteneur principal */
+  main {
+    height: calc(100dvh - var(--header-h));
+    position: relative;
+  }
+
+  .view {
+    display: none;
+    height: 100%;
+    width: 100%;
+  }
+
+  .view.active {
+    display: block;
+  }
+
+  /* Vues défilantes (Paramètres, Groupe, Bilan) */
+  .scroll-view {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 40px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .card h2 {
+    margin: 0 0 12px 0;
+    font-size: 1.15rem;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+
+  label.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  input[type="text"], input[type="date"], input[type="number"] {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--text);
+    user-select: text;
+    min-height: 46px;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    touch-action: manipulation;
+    transition: transform 0.06s ease, opacity 0.15s ease;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-outline { background: #fff; color: var(--dark); border: 2px solid var(--border); }
+  .btn-sm { min-height: 40px; padding: 8px 12px; font-size: 0.85rem; }
+
+  /* Interrupteurs modulables */
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px;
+  }
+
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: #f8fafc;
+    cursor: pointer;
+    min-height: 52px;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  .toggle-item.on {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: #14532d;
+  }
+
+  .toggle-item input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+
+  /* Liste des élèves */
+  .student-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .student-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+  }
+
+  /* =========================================================
+     VUE ASSAUT : ÉCRAN FIXE SANS SCROLL + SILHOUETTE ANIMÉE
+     ========================================================= */
+  #view-assaut.active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .assaut-top {
+    display: grid;
+    grid-template-columns: 1.2fr auto 1.2fr;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    flex-shrink: 0;
+  }
+
+  .roles-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.82rem;
+  }
+
+  .role-pill {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 600;
+  }
+
+  .chrono-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--dark);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 12px;
+  }
+
+  .chrono-display {
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    min-width: 82px;
+    text-align: center;
+  }
+
+  .chrono-display.warning { color: #fbbf24; }
+  .chrono-display.ended { color: #f87171; }
+
+  .chrono-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .assaut-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .fighters-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .fighter-panel {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    border: 3px solid transparent;
+    padding: 10px;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .fighter-panel.red {
+    background: var(--red-light);
+    border-color: var(--red-border);
+  }
+
+  .fighter-panel.blue {
+    background: var(--blue-light);
+    border-color: var(--blue-border);
+  }
+
+  .fighter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .fighter-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fighter-panel.red .fighter-name { color: var(--red); }
+  .fighter-panel.blue .fighter-name { color: var(--blue); }
+
+  .score-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 4px 14px;
+    text-align: center;
+    border: 2px solid var(--border);
+    min-width: 72px;
+  }
+
+  .score-val {
+    font-size: 1.7rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .score-lbl {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .fault-badge {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 4px 10px;
+    text-align: center;
+    min-width: 62px;
+  }
+
+  /* Scène interactive avec bonhomme animé en arrière-plan */
+  .boxer-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .boxer-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+    padding: 6px;
+  }
+
+  .boxer-svg {
+    height: 100%;
+    max-width: 100%;
+    opacity: 0.28;
+    animation: boxerGuard 1.8s ease-in-out infinite;
+    transform-origin: center bottom;
+  }
+
+  @keyframes boxerGuard {
+    0%, 100% { transform: translateY(0px) scaleY(1); }
+    50% { transform: translateY(-6px) scaleY(1.015); }
+  }
+
+  .boxer-svg .gloves-anim {
+    animation: glovesBob 1.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes glovesBob {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  /* Superposition des 3 étages anatomiques (Tête / Médiane / Basse) */
+  .zone-row {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .zone-row.zone-head {
+    grid-template-columns: 1fr 1.6fr 1fr;
+  }
+
+  .zone-row.zone-mid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .zone-row.zone-low {
+    grid-template-columns: 1fr 0.4fr 1fr;
+  }
+
+  .zone-btn {
+    height: 100%;
+    min-height: 58px;
+    border-radius: 12px;
+    border: 2px solid rgba(15, 23, 42, 0.16);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(2px);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.06s ease, background 0.12s ease;
+  }
+
+  .zone-btn:active {
+    transform: scale(0.95);
+    background: #e2e8f0;
+  }
+
+  .zone-btn.hidden-slot {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .touch-tech {
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .touch-zone {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .touch-pts {
+    margin-top: 3px;
+    font-size: 0.82rem;
+    font-weight: 900;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+
+  .fighter-panel.red .touch-pts { background: #fee2e2; color: var(--red); }
+  .fighter-panel.blue .touch-pts { background: #dbeafe; color: var(--blue); }
+
+  /* Pied de panneau Tireur : Faute + Annuler */
+  .fighter-footer {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .fault-trigger {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    min-height: 50px;
+    font-size: 0.98rem;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .undo-btn {
+    background: #fff;
+    color: var(--dark);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    min-height: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  /* Modale des fautes (Arbitre) */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+
+  .modal-backdrop.open { display: flex; }
+
+  .modal-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .fault-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .fault-opt-btn {
+    background: var(--amber-light);
+    border: 2px solid #f59e0b;
+    color: #78350f;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    text-align: left;
+    min-height: 56px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .fault-opt-btn:active { background: #fde68a; }
+
+  /* Tableaux de bilan */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: var(--dark);
+    white-space: nowrap;
+  }
+
+  td:first-child, th:first-child { text-align: left; font-weight: 700; }
+
+  .pill-ok {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .pill-no {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 100;
+  }
+
+  .toast.show { opacity: 1; }
+
+  /* Adaptation mobile / portrait étroit */
+  @media (max-width: 760px) {
+    .brand-sub { display: none; }
+    .assaut-top {
+      grid-template-columns: 1fr;
+      padding: 6px 8px;
+      gap: 6px;
+    }
+    .chrono-box { justify-content: center; }
+    .assaut-actions { justify-content: center; }
+    .fighters-grid { gap: 6px; }
+    .fighter-panel { padding: 6px; }
+    .fighter-name { font-size: 1rem; }
+    .score-val { font-size: 1.3rem; }
+    .touch-tech { font-size: 0.82rem; }
+    .touch-zone { font-size: 0.68rem; }
+    .touch-pts { font-size: 0.75rem; padding: 1px 6px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <!-- Logo SVG autonome Savate - Boxe française -->
+    <svg width="42" height="42" viewBox="0 0 64 64" aria-label="Logo Savate Boxe française">
+      <circle cx="32" cy="32" r="30" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+      <path d="M10 48 Q32 58 54 48" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+      <path d="M22 52 Q32 56 42 52" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      <path d="M38 51 Q46 52 54 48" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+      <path d="M18 24 C18 16, 30 14, 34 20 C36 23, 35 29, 31 32 L22 32 C19 32, 18 28, 18 24 Z" fill="#dc2626"/>
+      <rect x="20" y="32" width="11" height="5" rx="2" fill="#f8fafc"/>
+      <path d="M35 36 L49 23 C52 21, 55 24, 53 27 L44 38 C41 41, 37 41, 35 36 Z" fill="#38bdf8"/>
+    </svg>
+    <div>
+      <div class="brand-title">Savate - Boxe française</div>
+      <div class="brand-sub">Arbitrage &amp; Jugement EPS</div>
+    </div>
+  </div>
+
+  <nav>
+    <button class="nav-btn active" data-view="assaut">🥊 Assaut</button>
+    <button class="nav-btn" data-view="groupe">👥 Groupe &amp; Rotations</button>
+    <button class="nav-btn" data-view="reglages">⚙️ Progression</button>
+    <button class="nav-btn" data-view="bilan">📊 Bilan</button>
+  </nav>
+</header>
+
+<main>
+  <!-- =======================================================
+       1. VUE ASSAUT (ÉCRAN FIXE SANS SCROLL)
+       ======================================================= -->
+  <section id="view-assaut" class="view active">
+    <div class="assaut-top">
+      <div class="roles-strip" id="assaut-roles"></div>
+
+      <div class="chrono-box">
+        <span class="chrono-display" id="chrono-display">01:30</span>
+        <button class="chrono-btn" id="btn-chrono-toggle" style="background:#22c55e;color:#052e16;">▶</button>
+        <button class="chrono-btn" id="btn-chrono-reset" style="background:#475569;color:#fff;">↺</button>
+      </div>
+
+      <div class="assaut-actions">
+        <button class="btn btn-success btn-sm" id="btn-save-assaut">✓ Valider l'assaut</button>
+        <button class="btn btn-outline btn-sm" id="btn-next-rotation">Suivant ⏭</button>
+      </div>
+    </div>
+
+    <div class="fighters-grid">
+      <!-- TIREUR ROUGE -->
+      <div class="fighter-panel red">
+        <div class="fighter-header">
+          <div class="fighter-name" id="name-red">Élève 1</div>
+          <div class="score-group">
+            <div class="fault-badge">
+              <div class="score-val" id="faults-red" style="font-size:1.3rem;">0</div>
+              <div class="score-lbl">Fautes</div>
+            </div>
+            <div class="score-box">
+              <div class="score-val" id="score-red">0</div>
+              <div class="score-lbl">Points</div>
+            </div>
+          </div>
+        </div>
+        <div class="boxer-stage" id="stage-red"></div>
+        <div class="fighter-footer">
+          <button class="fault-trigger" onclick="openFaultModal('red')">⚠️ Signaler faute (Rouge)</button>
+          <button class="undo-btn" onclick="undoLastAction('red')">↩ Annuler</button>
+        </div>
+      </div>
+
+      <!-- TIREUR BLEU -->
+      <div class="fighter-panel blue">
+        <div class="fighter-header">
+          <div class="fighter-name" id="name-blue">Élève 2</div>
+          <div class="score-group">
+            <div class="fault-badge">
+              <div class="score-val" id="faults-blue" style="font-size:1.3rem;">0</div>
+              <div class="score-lbl">Fautes</div>
+            </div>
+            <div class="score-box">
+              <div class="score-val" id="score-blue">0</div>
+              <div class="score-lbl">Points</div>
+            </div>
+          </div>
+        </div>
+        <div class="boxer-stage" id="stage-blue"></div>
+        <div class="fighter-footer">
+          <button class="fault-trigger" onclick="openFaultModal('blue')">⚠️ Signaler faute (Bleu)</button>
+          <button class="undo-btn" onclick="undoLastAction('blue')">↩ Annuler</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================
+       2. VUE GROUPE & ROTATIONS (SCROLL VERTICAL)
+       ======================================================= -->
+  <section id="view-groupe" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>Informations de la séance</h2>
+        <div class="grid-3">
+          <label class="field">Groupe / Enceinte
+            <input type="text" id="meta-group" placeholder="Ex : Ring 1 - 4eB">
+          </label>
+          <label class="field">Date
+            <input type="date" id="meta-date">
+          </label>
+          <label class="field">Autre donnée (Leçon, thème…)
+            <input type="text" id="meta-other" placeholder="Ex : Leçon 3 - Enchaînements">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>Élèves du groupe (4 à 6 élèves)</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" id="btn-remove-student">− Élève</button>
+            <button class="btn btn-primary btn-sm" id="btn-add-student">+ Élève</button>
+          </div>
+        </h2>
+        <div id="students-list"></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-success" id="btn-apply-students">Enregistrer et générer les rotations équilibrées</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ordre des rotations équilibrées (avec récupération)</h2>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:0.9rem;">
+          Les assauts sont ordonnés pour espacer au maximum les reprises de chaque élève. Touchez « Charger » pour lancer une rencontre.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Assaut</th>
+                <th>Tireur Rouge</th>
+                <th>Tireur Bleu</th>
+                <th>Arbitre</th>
+                <th>Contre-arbitre</th>
+                <th>Juge(s)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rotations-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================
+       3. VUE PROGRESSION / PARAMÈTRES (SCROLL VERTICAL)
+       ======================================================= -->
+  <section id="view-reglages" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>Durée d'une reprise</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="setDuration(60)">1 min</button>
+          <button class="btn btn-outline btn-sm" onclick="setDuration(90)">1 min 30</button>
+          <button class="btn btn-outline btn-sm" onclick="setDuration(120)">2 min</button>
+          <label class="field" style="flex-direction:row;align-items:center;gap:8px;">
+            Secondes :
+            <input type="number" id="input-duration" min="15" max="300" step="5" style="width:95px;">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Techniques autorisées (modulable selon la leçon)</h2>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:0.9rem;">
+          Exemple : en leçon 2, décochez « Fouetté » pour ne garder que le Direct et le Chassé.
+        </p>
+        <div class="toggle-grid" id="config-techniques"></div>
+      </div>
+
+      <div class="card">
+        <h2>Zones de touches et barème</h2>
+        <div class="toggle-grid" id="config-zones"></div>
+      </div>
+
+      <div class="card">
+        <h2>Fautes actives pour l'arbitrage</h2>
+        <div class="toggle-grid" id="config-faults"></div>
+      </div>
+
+      <div class="card">
+        <h2>Gestion des données</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-danger" id="btn-reset-all">Réinitialiser la séance</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================
+       4. VUE BILAN & TABLEAU RÉCAPITULATIF (SCROLL VERTICAL)
+       ======================================================= -->
+  <section id="view-bilan" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>
+          <span>Tableau récapitulatif cumulatif par élève</span>
+          <button class="btn btn-primary btn-sm" id="btn-export-csv">⬇ Exporter CSV</button>
+        </h2>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:0.9rem;">
+          Vérification automatique de l'utilisation des techniques pieds/poings et cumul des touches par zone.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Élève</th>
+                <th>Assauts</th>
+                <th>Score Total</th>
+                <th>Fautes</th>
+                <th>Direct</th>
+                <th>Chassé</th>
+                <th>Fouetté</th>
+                <th>Basse</th>
+                <th>Médiane</th>
+                <th>Tête</th>
+                <th>Variété Pieds/Poings</th>
+              </tr>
+            </thead>
+            <tbody id="summary-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Historique des rencontres enregistrées</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tireur Rouge</th>
+                <th>Score</th>
+                <th>Tireur Bleu</th>
+                <th>Score</th>
+                <th>Fautes (R / B)</th>
+                <th>Touches (R / B)</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Modale de sélection de faute -->
+<div class="modal-backdrop" id="fault-modal">
+  <div class="modal-card">
+    <h2 id="fault-modal-title" style="margin:0;">Signaler une faute</h2>
+    <p style="margin:6px 0 0 0;color:var(--muted);font-size:0.9rem;">
+      Sélectionnez la faute observée par l'arbitre :
+    </p>
+    <div class="fault-options" id="fault-options"></div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeFaultModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   DONNÉES DE RÉFÉRENCE (BARÈME, TECHNIQUES, ZONES, FAUTES)
+   ===================================================================== */
+const STORAGE_KEY = "savate_eps_v2";
+
+const TECHNIQUES = [
+  { id: "direct", label: "Direct (Poing)", type: "poing" },
+  { id: "chasse", label: "Chassé (Pied)", type: "pied" },
+  { id: "fouette", label: "Fouetté (Pied)", type: "pied" }
+];
+
+const TOUCH_COMBOS = {
+  direct_tete:     { id: "direct_tete",     tech: "direct",  zone: "tete",    zoneLabel: "Tête",    pts: 2, label: "Direct" },
+  fouette_mediane: { id: "fouette_mediane", tech: "fouette", zone: "mediane", zoneLabel: "Médiane", pts: 2, label: "Fouetté" },
+  direct_mediane:  { id: "direct_mediane",  tech: "direct",  zone: "mediane", zoneLabel: "Médiane", pts: 1, label: "Direct" },
+  chasse_mediane:  { id: "chasse_mediane",  tech: "chasse",  zone: "mediane", zoneLabel: "Médiane", pts: 2, label: "Chassé" },
+  fouette_basse:   { id: "fouette_basse",   tech: "fouette", zone: "basse",   zoneLabel: "Basse",   pts: 1, label: "Fouetté" },
+  chasse_basse:    { id: "chasse_basse",    tech: "chasse",  zone: "basse",   zoneLabel: "Basse",   pts: 1, label: "Chassé" }
+};
+
+const ZONES = [
+  { id: "basse",   label: "Zone basse (Pied : 1 pt)" },
+  { id: "mediane", label: "Zone médiane (Poing : 1 pt / Pied : 2 pts)" },
+  { id: "tete",    label: "Tête / Zone haute (Poing : 2 pts)" }
+];
+
+const FAULTS = [
+  { id: "zone_interdite",      label: "Zone interdite" },
+  { id: "puissance_excessive", label: "Puissance excessive" },
+  { id: "hors_zone",           label: "Touches hors zone" },
+  { id: "accrochage",          label: "Accrochage" },
+  { id: "tete_en_avant",       label: "Boxe tête en avant" },
+  { id: "trajectoire_vert",    label: "Trajectoire verticale" },
+  { id: "fair_play",           label: "Non-respect des ordres / fair-play" }
+];
+
+/* =====================================================================
+   ÉTAT DE L'APPLICATION
+   ===================================================================== */
+function getDefaultState() {
+  return {
+    meta: {
+      group: "Ring 1",
+      date: new Date().toISOString().slice(0, 10),
+      other: "Séance Savate"
+    },
+    config: {
+      duration: 90,
+      techniques: { direct: true, chasse: true, fouette: true },
+      zones: { basse: true, mediane: true, tete: true },
+      faults: {
+        zone_interdite: true,
+        puissance_excessive: true,
+        hors_zone: true,
+        accrochage: true,
+        tete_en_avant: true,
+        trajectoire_vert: true,
+        fair_play: true
+      }
+    },
+    students: [
+      { id: 1, prenom: "Élève 1", nom: "" },
+      { id: 2, prenom: "Élève 2", nom: "" },
+      { id: 3, prenom: "Élève 3", nom: "" },
+      { id: 4, prenom: "Élève 4", nom: "" }
+    ],
+    rotations: [],
+    currentRotationIdx: 0,
+    currentMatch: createEmptyMatch(),
+    history: []
+  };
+}
+
+function createEmptyMatch() {
+  return {
+    red: { score: 0, events: [] },
+    blue: { score: 0, events: [] }
+  };
+}
+
+let state = loadState();
+if (!state.rotations || state.rotations.length === 0) {
+  state.rotations = generateRotations(state.students);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return getDefaultState();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+function fullName(s) {
+  if (!s) return "—";
+  return `${s.prenom} ${s.nom}`.trim() || `Élève ${s.id}`;
+}
+
+function getStudentById(id) {
+  return state.students.find(s => s.id === id);
+}
+
+/* =====================================================================
+   GÉNÉRATION DES ROTATIONS ÉQUILIBRÉES (RÉCUPÉRATION OPTIMALE)
+   ===================================================================== */
+function generateRotations(students) {
+  const n = students.length;
+  const ids = students.map(s => s.id);
+
+  // 1. Créer toutes les paires uniques
+  const remaining = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      remaining.push([ids[i], ids[j]]);
+    }
+  }
+
+  // 2. Ordonner les rencontres pour maximiser le temps de récupération entre deux reprises
+  const orderedPairs = [];
+  const lastPlayed = {};
+  const playCount = {};
+  ids.forEach(id => {
+    lastPlayed[id] = -10;
+    playCount[id] = 0;
+  });
+
+  for (let step = 0; remaining.length > 0; step++) {
+    let bestIdx = 0;
+    let bestScore = -Infinity;
+
+    for (let i = 0; i < remaining.length; i++) {
+      const [a, b] = remaining[i];
+      const restA = step - lastPlayed[a];
+      const restB = step - lastPlayed[b];
+      const minRest = Math.min(restA, restB);
+      // Priorité absolue au plus grand repos minimum, puis au repos cumulé et à l'équilibre du nombre de matchs
+      const score = minRest * 1000 + (restA + restB) * 20 - (playCount[a] + playCount[b]) * 5;
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+
+    const [a, b] = remaining.splice(bestIdx, 1)[0];
+    // Alterner coin Rouge / Bleu
+    const pair = (step % 2 === 0) ? [a, b] : [b, a];
+    orderedPairs.push(pair);
+    lastPlayed[a] = step;
+    lastPlayed[b] = step;
+    playCount[a]++;
+    playCount[b]++;
+  }
+
+  // 3. Attribuer équitablement les rôles d'arbitre, contre-arbitre et juges
+  return orderedPairs.map((pair, idx) => {
+    const [redId, blueId] = pair;
+    const others = ids.filter(id => id !== redId && id !== blueId);
+    const shift = idx % others.length;
+    const rotated = others.slice(shift).concat(others.slice(0, shift));
+
+    let arbitre = rotated[0] || null;
+    let contreArbitre = null;
+    let juges = [];
+
+    if (n === 4) {
+      juges = rotated.slice(1, 2);
+    } else if (n === 5) {
+      juges = rotated.slice(1, 3);
+    } else if (n >= 6) {
+      contreArbitre = rotated[1] || null;
+      juges = rotated.slice(2, 4);
+    }
+
+    return { redId, blueId, arbitre, contreArbitre, juges };
+  });
+}
+
+/* =====================================================================
+   CHRONOMÈTRE ET GONG SONORE (WEB AUDIO API HORS LIGNE)
+   ===================================================================== */
+let timeLeft = state.config.duration;
+let timerInterval = null;
+
+function playBeep(freq = 660, duration = 0.25, count = 1) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < count; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const start = ctx.currentTime + i * (duration + 0.12);
+      osc.start(start);
+      gain.gain.setValueAtTime(0.3, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+      osc.stop(start + duration);
+    }
+  } catch (e) {}
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function updateChronoDisplay() {
+  const el = document.getElementById("chrono-display");
+  el.textContent = formatTime(timeLeft);
+  el.classList.toggle("warning", timeLeft <= 10 && timeLeft > 0);
+  el.classList.toggle("ended", timeLeft === 0);
+}
+
+function toggleChrono() {
+  const btn = document.getElementById("btn-chrono-toggle");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.textContent = "▶";
+    btn.style.background = "#22c55e";
+  } else {
+    if (timeLeft <= 0) timeLeft = state.config.duration;
+    playBeep(880, 0.2, 1);
+    btn.textContent = "❚❚";
+    btn.style.background = "#f59e0b";
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft === 10) playBeep(520, 0.12, 1);
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.textContent = "▶";
+        btn.style.background = "#22c55e";
+        playBeep(440, 0.35, 3);
+      }
+      updateChronoDisplay();
+    }, 1000);
+  }
+}
+
+function resetChrono() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  timeLeft = state.config.duration;
+  const btn = document.getElementById("btn-chrono-toggle");
+  btn.textContent = "▶";
+  btn.style.background = "#22c55e";
+  updateChronoDisplay();
+}
+
+/* =====================================================================
+   SILHOUETTE ANIMÉE BOXE FRANÇAISE + BOUTONS ANATOMIQUES
+   ===================================================================== */
+function getBoxerSVG(side) {
+  const mainColor = side === "red" ? "#dc2626" : "#2563eb";
+  const accentColor = side === "red" ? "#991b1b" : "#1d4ed8";
+  return `
+    <svg class="boxer-svg" viewBox="0 0 220 320" aria-hidden="true">
+      <!-- Tête -->
+      <circle cx="110" cy="46" r="24" fill="${mainColor}"/>
+      <!-- Cou et buste (combinaison académique Savate) -->
+      <path d="M84 78 C84 72, 136 72, 136 78 L142 162 L78 162 Z" fill="${mainColor}"/>
+      <!-- Ceinture -->
+      <rect x="78" y="156" width="64" height="10" rx="4" fill="${accentColor}"/>
+      <!-- Bras & Gants en garde (animés) -->
+      <g class="gloves-anim">
+        <path d="M84 86 L58 118 L74 134" fill="none" stroke="${mainColor}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M136 86 L162 118 L146 134" fill="none" stroke="${mainColor}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="76" cy="128" r="14" fill="${accentColor}"/>
+        <circle cx="144" cy="128" r="14" fill="${accentColor}"/>
+      </g>
+      <!-- Jambes en garde -->
+      <path d="M90 164 L76 238 L68 296" fill="none" stroke="${mainColor}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M130 164 L144 238 L152 296" fill="none" stroke="${mainColor}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Chaussures de Savate -->
+      <ellipse cx="64" cy="302" rx="16" ry="8" fill="${accentColor}"/>
+      <ellipse cx="156" cy="302" rx="16" ry="8" fill="${accentColor}"/>
+    </svg>
+  `;
+}
+
+function renderZoneButton(side, comboId) {
+  const c = TOUCH_COMBOS[comboId];
+  const isActive = state.config.techniques[c.tech] && state.config.zones[c.zone];
+  if (!isActive) {
+    return `<div class="zone-btn hidden-slot"></div>`;
+  }
+  return `
+    <button class="zone-btn" onclick="recordTouch('${side}', '${c.id}')">
+      <span class="touch-tech">${c.label}</span>
+      <span class="touch-zone">${c.zoneLabel}</span>
+      <span class="touch-pts">+${c.pts} pt${c.pts > 1 ? "s" : ""}</span>
+    </button>
+  `;
+}
+
+function renderAssaut() {
+  const rot = state.rotations[state.currentRotationIdx] || state.rotations[0];
+  if (!rot) return;
+
+  document.getElementById("name-red").textContent = fullName(getStudentById(rot.redId));
+  document.getElementById("name-blue").textContent = fullName(getStudentById(rot.blueId));
+
+  const rolesEl = document.getElementById("assaut-roles");
+  const jugesNames = rot.juges.map(id => fullName(getStudentById(id))).join(", ");
+  rolesEl.innerHTML = `
+    <span class="role-pill">Assaut ${state.currentRotationIdx + 1}/${state.rotations.length}</span>
+    <span class="role-pill">Arbitre : ${fullName(getStudentById(rot.arbitre))}</span>
+    ${rot.contreArbitre ? `<span class="role-pill">Contre-arb. : ${fullName(getStudentById(rot.contreArbitre))}</span>` : ""}
+    <span class="role-pill">Juge(s) : ${jugesNames || "—"}</span>
+  `;
+
+  ["red", "blue"].forEach(side => {
+    const data = state.currentMatch[side];
+    document.getElementById(`score-${side}`).textContent = data.score;
+    document.getElementById(`faults-${side}`).textContent = data.events.filter(e => e.kind === "fault").length;
+
+    const stage = document.getElementById(`stage-${side}`);
+    stage.innerHTML = `
+      <div class="boxer-bg">${getBoxerSVG(side)}</div>
+
+      <!-- Zone Tête : Direct au centre -->
+      <div class="zone-row zone-head">
+        <div></div>
+        ${renderZoneButton(side, "direct_tete")}
+        <div></div>
+      </div>
+
+      <!-- Zone Médiane : Fouetté à gauche | Direct au centre | Chassé à droite -->
+      <div class="zone-row zone-mid">
+        ${renderZoneButton(side, "fouette_mediane")}
+        ${renderZoneButton(side, "direct_mediane")}
+        ${renderZoneButton(side, "chasse_mediane")}
+      </div>
+
+      <!-- Zone Basse : Fouetté à gauche | Chassé à droite -->
+      <div class="zone-row zone-low">
+        ${renderZoneButton(side, "fouette_basse")}
+        <div></div>
+        ${renderZoneButton(side, "chasse_basse")}
+      </div>
+    `;
+  });
+}
+
+function recordTouch(side, comboId) {
+  const combo = TOUCH_COMBOS[comboId];
+  if (!combo) return;
+  state.currentMatch[side].score += combo.pts;
+  state.currentMatch[side].events.push({
+    kind: "touch",
+    tech: combo.tech,
+    zone: combo.zone,
+    pts: combo.pts
+  });
+  saveState();
+  renderAssaut();
+}
+
+function undoLastAction(side) {
+  const ev = state.currentMatch[side].events.pop();
+  if (!ev) {
+    showToast("Aucune action à annuler");
+    return;
+  }
+  if (ev.kind === "touch") {
+    state.currentMatch[side].score = Math.max(0, state.currentMatch[side].score - ev.pts);
+  }
+  saveState();
+  renderAssaut();
+  showToast("Dernière action annulée");
+}
+
+/* =====================================================================
+   MODALE DES FAUTES (ARBITRAGE)
+   ===================================================================== */
+let faultTargetSide = null;
+
+function openFaultModal(side) {
+  faultTargetSide = side;
+  const rot = state.rotations[state.currentRotationIdx];
+  const student = getStudentById(side === "red" ? rot.redId : rot.blueId);
+  document.getElementById("fault-modal-title").textContent =
+    `Faute pour ${fullName(student)} (${side === "red" ? "Rouge" : "Bleu"})`;
+
+  const container = document.getElementById("fault-options");
+  const activeFaults = FAULTS.filter(f => state.config.faults[f.id]);
+
+  if (activeFaults.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted);">Aucune faute activée dans l'onglet Progression.</p>`;
+  } else {
+    container.innerHTML = activeFaults.map(f => `
+      <button class="fault-opt-btn" onclick="recordFault('${f.id}')">${f.label}</button>
+    `).join("");
+  }
+  document.getElementById("fault-modal").classList.add("open");
+}
+
+function closeFaultModal() {
+  document.getElementById("fault-modal").classList.remove("open");
+}
+
+function recordFault(faultId) {
+  if (!faultTargetSide) return;
+  state.currentMatch[faultTargetSide].events.push({
+    kind: "fault",
+    faultId
+  });
+  saveState();
+  renderAssaut();
+  closeFaultModal();
+  const f = FAULTS.find(x => x.id === faultId);
+  showToast(`Faute enregistrée : ${f ? f.label : ""}`);
+}
+
+/* =====================================================================
+   VALIDATION D'UN ASSAUT ET PASSAGE AU SUIVANT
+   ===================================================================== */
+function saveCurrentAssaut() {
+  const rot = state.rotations[state.currentRotationIdx];
+  if (!rot) return;
+
+  state.history.push({
+    id: Date.now(),
+    date: state.meta.date,
+    group: state.meta.group,
+    redId: rot.redId,
+    blueId: rot.blueId,
+    redName: fullName(getStudentById(rot.redId)),
+    blueName: fullName(getStudentById(rot.blueId)),
+    redScore: state.currentMatch.red.score,
+    blueScore: state.currentMatch.blue.score,
+    redEvents: JSON.parse(JSON.stringify(state.currentMatch.red.events)),
+    blueEvents: JSON.parse(JSON.stringify(state.currentMatch.blue.events))
+  });
+
+  state.currentMatch = createEmptyMatch();
+  state.currentRotationIdx = (state.currentRotationIdx + 1) % state.rotations.length;
+  resetChrono();
+  saveState();
+  renderAssaut();
+  renderBilan();
+  showToast("Assaut enregistré ! Rotation suivante prête.");
+}
+
+function nextRotation() {
+  state.currentMatch = createEmptyMatch();
+  state.currentRotationIdx = (state.currentRotationIdx + 1) % state.rotations.length;
+  resetChrono();
+  saveState();
+  renderAssaut();
+  showToast(`Assaut ${state.currentRotationIdx + 1} chargé`);
+}
+
+/* =====================================================================
+   RENDU GROUPE & ROTATIONS
+   ===================================================================== */
+function renderGroupe() {
+  document.getElementById("meta-group").value = state.meta.group;
+  document.getElementById("meta-date").value = state.meta.date;
+  document.getElementById("meta-other").value = state.meta.other;
+
+  const list = document.getElementById("students-list");
+  list.innerHTML = state.students.map((s, idx) => `
+    <div class="student-row">
+      <div class="student-badge">${idx + 1}</div>
+      <input type="text" value="${s.prenom}" placeholder="Prénom / Élève ${idx + 1}" onchange="updateStudent(${idx}, 'prenom', this.value)">
+      <input type="text" value="${s.nom}" placeholder="Nom (optionnel)" onchange="updateStudent(${idx}, 'nom', this.value)">
+      <span style="font-size:0.8rem;color:var(--muted);">ID #${s.id}</span>
+    </div>
+  `).join("");
+
+  const tbody = document.getElementById("rotations-tbody");
+  tbody.innerHTML = state.rotations.map((r, i) => `
+    <tr style="${i === state.currentRotationIdx ? 'background:#eff6ff;' : ''}">
+      <td>#${i + 1}</td>
+      <td style="color:var(--red);font-weight:700;">${fullName(getStudentById(r.redId))}</td>
+      <td style="color:var(--blue);font-weight:700;">${fullName(getStudentById(r.blueId))}</td>
+      <td>${fullName(getStudentById(r.arbitre))}</td>
+      <td>${r.contreArbitre ? fullName(getStudentById(r.contreArbitre)) : "—"}</td>
+      <td>${r.juges.map(id => fullName(getStudentById(id))).join(", ") || "—"}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="loadRotation(${i})">Charger</button></td>
+    </tr>
+  `).join("");
+}
+
+function updateStudent(idx, field, val) {
+  state.students[idx][field] = val;
+  saveState();
+}
+
+function loadRotation(idx) {
+  state.currentRotationIdx = idx;
+  state.currentMatch = createEmptyMatch();
+  resetChrono();
+  saveState();
+  switchView("assaut");
+  renderAssaut();
+}
+
+/* =====================================================================
+   RENDU PROGRESSION / PARAMÈTRES
+   ===================================================================== */
+function renderReglages() {
+  document.getElementById("input-duration").value = state.config.duration;
+
+  document.getElementById("config-techniques").innerHTML = TECHNIQUES.map(t => {
+    const on = !!state.config.techniques[t.id];
+    return `
+      <label class="toggle-item ${on ? "on" : ""}">
+        <span>${t.label}</span>
+        <input type="checkbox" ${on ? "checked" : ""} onchange="toggleConfig('techniques','${t.id}',this.checked)">
+      </label>
+    `;
+  }).join("");
+
+  document.getElementById("config-zones").innerHTML = ZONES.map(z => {
+    const on = !!state.config.zones[z.id];
+    return `
+      <label class="toggle-item ${on ? "on" : ""}">
+        <span>${z.label}</span>
+        <input type="checkbox" ${on ? "checked" : ""} onchange="toggleConfig('zones','${z.id}',this.checked)">
+      </label>
+    `;
+  }).join("");
+
+  document.getElementById("config-faults").innerHTML = FAULTS.map(f => {
+    const on = !!state.config.faults[f.id];
+    return `
+      <label class="toggle-item ${on ? "on" : ""}">
+        <span>${f.label}</span>
+        <input type="checkbox" ${on ? "checked" : ""} onchange="toggleConfig('faults','${f.id}',this.checked)">
+      </label>
+    `;
+  }).join("");
+}
+
+function toggleConfig(group, key, checked) {
+  state.config[group][key] = checked;
+  saveState();
+  renderReglages();
+  renderAssaut();
+}
+
+function setDuration(sec) {
+  state.config.duration = sec;
+  document.getElementById("input-duration").value = sec;
+  resetChrono();
+  saveState();
+  showToast(`Reprise réglée sur ${formatTime(sec)}`);
+}
+
+/* =====================================================================
+   CALCULS AUTOMATIQUES & BILAN
+   ===================================================================== */
+function computeStudentStats() {
+  const stats = {};
+  state.students.forEach(s => {
+    stats[s.id] = {
+      name: fullName(s),
+      assauts: 0,
+      score: 0,
+      faults: 0,
+      tech: { direct: 0, chasse: 0, fouette: 0 },
+      zone: { basse: 0, mediane: 0, tete: 0 }
+    };
+  });
+
+  state.history.forEach(m => {
+    [
+      { id: m.redId, score: m.redScore, events: m.redEvents },
+      { id: m.blueId, score: m.blueScore, events: m.blueEvents }
+    ].forEach(side => {
+      const st = stats[side.id];
+      if (!st) return;
+      st.assauts++;
+      st.score += side.score;
+      side.events.forEach(e => {
+        if (e.kind === "fault") st.faults++;
+        if (e.kind === "touch") {
+          if (st.tech[e.tech] !== undefined) st.tech[e.tech]++;
+          if (st.zone[e.zone] !== undefined) st.zone[e.zone]++;
+        }
+      });
+    });
+  });
+
+  return Object.values(stats);
+}
+
+function renderBilan() {
+  const rows = computeStudentStats();
+  const activeTechIds = TECHNIQUES.filter(t => state.config.techniques[t.id]).map(t => t.id);
+
+  document.getElementById("summary-tbody").innerHTML = rows.map(r => {
+    const usedAll = activeTechIds.length > 0 && activeTechIds.every(tid => r.tech[tid] > 0);
+    const hasPoing = r.tech.direct > 0;
+    const hasPied = (r.tech.chasse + r.tech.fouette) > 0;
+    const varieteHtml = usedAll
+      ? `<span class="pill-ok">✓ Toutes utilisées</span>`
+      : (hasPoing && hasPied)
+        ? `<span class="pill-ok">Pieds + Poings</span>`
+        : `<span class="pill-no">Incomplet</span>`;
+
+    return `
+      <tr>
+        <td>${r.name}</td>
+        <td>${r.assauts}</td>
+        <td><strong>${r.score}</strong></td>
+        <td>${r.faults}</td>
+        <td>${r.tech.direct}</td>
+        <td>${r.tech.chasse}</td>
+        <td>${r.tech.fouette}</td>
+        <td>${r.zone.basse}</td>
+        <td>${r.zone.mediane}</td>
+        <td>${r.zone.tete}</td>
+        <td>${varieteHtml}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const histEl = document.getElementById("history-tbody");
+  if (state.history.length === 0) {
+    histEl.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">Aucun assaut enregistré pour le moment.</td></tr>`;
+  } else {
+    histEl.innerHTML = state.history.map((m, idx) => {
+      const rf = m.redEvents.filter(e => e.kind === "fault").length;
+      const bf = m.blueEvents.filter(e => e.kind === "fault").length;
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td style="color:var(--red);font-weight:700;">${m.redName}</td>
+          <td><strong>${m.redScore}</strong></td>
+          <td style="color:var(--blue);font-weight:700;">${m.blueName}</td>
+          <td><strong>${m.blueScore}</strong></td>
+          <td>${rf} / ${bf}</td>
+          <td>${m.redEvents.filter(e => e.kind === "touch").length} t. / ${m.blueEvents.filter(e => e.kind === "touch").length} t.</td>
+        </tr>
+      `;
+    }).join("");
+  }
+}
+
+function exportCSV() {
+  const rows = computeStudentStats();
+  const header = ["Groupe", "Date", "Info", "Eleve", "Assauts", "Score Total", "Fautes", "Direct", "Chasse", "Fouette", "Zone Basse", "Zone Mediane", "Tete"];
+  const lines = [header.join(";")];
+  rows.forEach(r => {
+    lines.push([
+      state.meta.group, state.meta.date, state.meta.other, r.name,
+      r.assauts, r.score, r.faults,
+      r.tech.direct, r.tech.chasse, r.tech.fouette,
+      r.zone.basse, r.zone.mediane, r.zone.tete
+    ].join(";"));
+  });
+  const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `savate_${state.meta.group.replace(/\s+/g, "_")}_${state.meta.date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* =====================================================================
+   NAVIGATION & ÉVÉNEMENTS
+   ===================================================================== */
+function switchView(viewName) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById(`view-${viewName}`).classList.add("active");
+  document.querySelector(`.nav-btn[data-view="${viewName}"]`).classList.add("active");
+
+  if (viewName === "assaut") renderAssaut();
+  if (viewName === "groupe") renderGroupe();
+  if (viewName === "reglages") renderReglages();
+  if (viewName === "bilan") renderBilan();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchView(btn.dataset.view));
+});
+
+document.getElementById("btn-chrono-toggle").addEventListener("click", toggleChrono);
+document.getElementById("btn-chrono-reset").addEventListener("click", resetChrono);
+document.getElementById("btn-save-assaut").addEventListener("click", saveCurrentAssaut);
+document.getElementById("btn-next-rotation").addEventListener("click", nextRotation);
+document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
+
+document.getElementById("meta-group").addEventListener("input", e => { state.meta.group = e.target.value; saveState(); });
+document.getElementById("meta-date").addEventListener("input", e => { state.meta.date = e.target.value; saveState(); });
+document.getElementById("meta-other").addEventListener("input", e => { state.meta.other = e.target.value; saveState(); });
+
+document.getElementById("input-duration").addEventListener("change", e => {
+  const v = Math.max(15, Math.min(300, parseInt(e.target.value, 10) || 90));
+  setDuration(v);
+});
+
+document.getElementById("btn-add-student").addEventListener("click", () => {
+  if (state.students.length >= 6) {
+    showToast("Maximum 6 élèves par enceinte");
+    return;
+  }
+  const nextId = Math.max(0, ...state.students.map(s => s.id)) + 1;
+  state.students.push({ id: nextId, prenom: `Élève ${nextId}`, nom: "" });
+  saveState();
+  renderGroupe();
+});
+
+document.getElementById("btn-remove-student").addEventListener("click", () => {
+  if (state.students.length <= 4) {
+    showToast("Minimum 4 élèves par enceinte");
+    return;
+  }
+  state.students.pop();
+  saveState();
+  renderGroupe();
+});
+
+document.getElementById("btn-apply-students").addEventListener("click", () => {
+  state.rotations = generateRotations(state.students);
+  state.currentRotationIdx = 0;
+  state.currentMatch = createEmptyMatch();
+  saveState();
+  renderGroupe();
+  renderAssaut();
+  showToast("Rotations équilibrées générées !");
+});
+
+document.getElementById("btn-reset-all").addEventListener("click", () => {
+  if (confirm("Effacer l'historique et réinitialiser toute la séance ?")) {
+    localStorage.removeItem(STORAGE_KEY);
+    state = getDefaultState();
+    state.rotations = generateRotations(state.students);
+    resetChrono();
+    saveState();
+    renderReglages();
+    renderAssaut();
+    renderBilan();
+    showToast("Séance réinitialisée");
+  }
+});
+
+// Initialisation
+updateChronoDisplay();
+renderAssaut();
+</script>
+</body>
+</html>
