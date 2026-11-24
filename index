@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applications EPS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f4f6f8;
+      color: #1e293b;
+      padding: 2rem 1rem;
+    }
+    header {
+      max-width: 900px;
+      margin: 0 auto 2rem;
+      text-align: center;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    p.subtitle { color: #475569; }
+    .grid {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+    .card {
+      display: block;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover, .card:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      border-color: #2563eb;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #1d4ed8;
+      background: #dbeafe;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+    .card h2 { font-size: 1.2rem; margin-bottom: 0.4rem; }
+    .card p { font-size: 0.95rem; color: #475569; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Outils numériques EPS</h1>
+    <p class="subtitle">Sélectionne une application pour démarrer la séance</p>
+  </header>
+
+  <main class="grid">
+    <a class="card" href="/nom-de-ta-premiere-app/">
+      <span class="tag">Athlétisme</span>
+      <h2>Nom de la première app</h2>
+      <p>Courte description de l'usage pour les élèves ou les collègues.</p>
+    </a>
+
+    <a class="card" href="/nom-de-ta-deuxieme-app/">
+      <span class="tag">Sports collectifs</span>
+      <h2>Nom de la deuxième app</h2>
+      <p>Observation de match, comptage de points ou suivi de tournoi.</p>
+    </a>
+  </main>
+</body>
+</html>
