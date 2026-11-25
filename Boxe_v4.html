@@ -550,7 +550,6 @@
     align-items: center;
   }
 
-  /* Tête : Crochet G | Direct Front | Crochet D */
   .zone-row.zone-head { grid-template-columns: 0.85fr 1.3fr 0.85fr; }
   .zone-row.zone-mid  { grid-template-columns: 1fr 1fr 1fr; }
   .zone-row.zone-low  { grid-template-columns: 1fr 0.4fr 1fr; }
@@ -772,7 +771,7 @@
     touch-action: manipulation;
   }
 
-  /* Modales (Fautes & Confirmation Disqualification) */
+  /* Modales (Fautes, Disqualification & Mort Subite) */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -947,26 +946,33 @@
     gap: 4px;
   }
 
+  /* Messages d'information centrés au milieu de l'écran */
   .toast {
     position: fixed;
-    bottom: 16px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    background: var(--dark);
+    transform: translate(-50%, -50%) scale(0.92);
+    background: rgba(15, 23, 42, 0.94);
     color: #fff;
-    padding: 12px 20px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 0.92rem;
+    padding: 20px 30px;
+    border-radius: 18px;
+    border: 3px solid #38bdf8;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    font-weight: 800;
+    font-size: 1.25rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 100;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 120;
     text-align: center;
-    max-width: 90vw;
+    max-width: 86vw;
+    line-height: 1.35;
   }
 
-  .toast.show { opacity: 1; }
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
   @media (max-width: 760px) {
     .brand-sub { display: none; }
@@ -981,6 +987,7 @@
     .touch-zone { font-size: 0.65rem; }
     .touch-pts { font-size: 0.72rem; padding: 1px 6px; }
     .touch-subtotal { font-size: 0.62rem; padding: 1px 4px; }
+    .toast { font-size: 1.05rem; padding: 16px 22px; }
   }
 </style>
 </head>
@@ -1289,6 +1296,18 @@
   </div>
 </div>
 
+<!-- Modale de confirmation de victoire par Mort Subite -->
+<div class="modal-backdrop" id="sd-modal">
+  <div class="modal-card" style="max-width:520px;border:3px solid #7c3aed;">
+    <h2 style="margin:0;color:#7c3aed;">💀 Victoire par mort subite ?</h2>
+    <p id="sd-modal-text" style="margin:12px 0;font-size:1rem;line-height:1.45;"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn btn-outline" onclick="cancelSuddenDeath()">↩ Annuler le dernier coup</button>
+      <button class="btn btn-purple" onclick="confirmSuddenDeath()">✓ Confirmer la victoire</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1547,7 +1566,7 @@ function generateRotations(students) {
 }
 
 /* =====================================================================
-   CHRONOMÈTRE, SONS (DING + 10s + 3-2-1 + 3 BIPS FINAUX) ET DÉLAI 3s
+   CHRONOMÈTRE & CLOCHE DE RING AUTHENTIQUE (WEB AUDIO API HORS LIGNE)
    ===================================================================== */
 let timeLeft = state.config.duration;
 let timerInterval = null;
@@ -1563,22 +1582,54 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function playGongDing() {
+/* Synthèse réaliste d'une cloche de ring de boxe (frappe métallique + harmoniques inharmoniques + résonance longue) */
+function playBoxingBell() {
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
-    const freqs = [880, 1318.5, 1760, 2489];
-    freqs.forEach((f, idx) => {
+
+    const bufferSize = Math.floor(ctx.sampleRate * 0.04);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.setValueAtTime(3200, now);
+    bandpass.Q.setValueAtTime(1.5, now);
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.65, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    noise.connect(bandpass);
+    bandpass.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now);
+
+    const partials = [
+      { freq: 784,  amp: 0.34, decay: 2.6 },
+      { freq: 789,  amp: 0.22, decay: 2.4 },
+      { freq: 1568, amp: 0.20, decay: 2.0 },
+      { freq: 2158, amp: 0.16, decay: 1.7 },
+      { freq: 3012, amp: 0.12, decay: 1.3 },
+      { freq: 4235, amp: 0.08, decay: 0.9 },
+      { freq: 5290, amp: 0.05, decay: 0.55 }
+    ];
+
+    partials.forEach(p => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = idx === 0 ? "triangle" : "sine";
-      osc.frequency.setValueAtTime(f, now);
-      gain.gain.setValueAtTime(0.28 / (idx + 1), now);
-      gain.gain.exponentialRampToValueAtTime(0.0008, now + 1.15);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(p.freq, now);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(p.amp, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + p.decay);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
-      osc.stop(now + 1.2);
+      osc.stop(now + p.decay + 0.05);
     });
   } catch (e) {}
 }
@@ -1677,7 +1728,7 @@ function toggleChrono() {
   const isFreshStart = (chronoState === "idle" || timeLeft === state.config.duration);
   chronoState = "running";
   if (isFreshStart) {
-    playGongDing();
+    playBoxingBell();
     showToast("🔔 Début de reprise !");
   }
   updateChronoUI();
@@ -1696,7 +1747,7 @@ function toggleChrono() {
       timerInterval = null;
       chronoState = "grace";
       playBeep(440, 0.24, 3, 0.12);
-      showToast("Fin de reprise ! (Touches actives encore 3 secondes)");
+      showToast("Fin de reprise !\n(Touches actives encore 3 secondes)");
       updateChronoUI();
 
       graceTimeout = setTimeout(() => {
@@ -1848,6 +1899,9 @@ function renderAssaut() {
   updateChronoUI();
 }
 
+/* Confirmation de victoire par Mort Subite */
+let pendingSD = null;
+
 function recordTouch(side, comboId) {
   if (chronoState === "idle") {
     showToast("⏱️ Démarrez le chronomètre pour compter les touches !");
@@ -1874,23 +1928,47 @@ function recordTouch(side, comboId) {
     zone: combo.zone,
     pts: cfg.pts
   });
+  saveState();
+  renderAssaut();
 
   const sd = state.config.suddenDeath;
   if (sd.enabled && sd.comboId === comboId) {
     const hits = getComboHitCount(side, comboId);
     if (hits >= sd.targetHits) {
       pauseChrono();
-      playBeep(880, 0.2, 3, 0.08);
-      state.currentMatch[side].suddenDeathWin = true;
+      playBeep(880, 0.18, 2, 0.08);
       const rot = getActiveRotation();
       const winnerName = fullName(getStudentById(side === "red" ? rot.redId : rot.blueId));
-      saveCurrentAssaut("sudden_death", winnerName);
-      return;
+      pendingSD = { side, winnerName };
+      document.getElementById("sd-modal-text").innerHTML =
+        `<strong>${winnerName}</strong> vient d'atteindre <strong>${sd.targetHits} touche${sd.targetHits > 1 ? "s" : ""}</strong> sur la zone prioritaire (<em>${combo.label} — ${combo.zoneLabel}</em>).<br><br>Confirmez-vous la victoire immédiate par <strong>mort subite</strong> ?`;
+      document.getElementById("sd-modal").classList.add("open");
     }
   }
+}
 
+function cancelSuddenDeath() {
+  if (!pendingSD) return;
+  const { side } = pendingSD;
+  pendingSD = null;
+  document.getElementById("sd-modal").classList.remove("open");
+  const ev = state.currentMatch[side].events.pop();
+  if (ev && ev.kind === "touch") {
+    state.currentMatch[side].score = Math.max(0, state.currentMatch[side].score - ev.pts);
+  }
   saveState();
   renderAssaut();
+  showToast("↩ Dernier coup annulé. Vous pouvez relancer le chronomètre.");
+}
+
+function confirmSuddenDeath() {
+  if (!pendingSD) return;
+  const { side, winnerName } = pendingSD;
+  pendingSD = null;
+  document.getElementById("sd-modal").classList.remove("open");
+  playBoxingBell();
+  state.currentMatch[side].suddenDeathWin = true;
+  saveCurrentAssaut("sudden_death", winnerName);
 }
 
 function undoLastAction(side) {
@@ -2052,11 +2130,11 @@ function saveCurrentAssaut(endReason = "normal", extraName = "") {
   renderBilan();
 
   if (endReason === "disqualification") {
-    showToast("⛔ Rencontre terminée par disqualification et enregistrée au bilan.");
+    showToast("⛔ Rencontre terminée par disqualification !");
   } else if (endReason === "sudden_death") {
-    showToast(`💀 Victoire par mort subite pour ${extraName} ! Enregistrée au bilan.`);
+    showToast(`💀 Victoire par mort subite pour ${extraName} !`);
   } else {
-    showToast("Assaut enregistré ! Rotation suivante prête.");
+    showToast("✓ Assaut enregistré ! Rotation suivante prête.");
   }
 }
 
@@ -2435,10 +2513,10 @@ function switchView(viewName) {
 let toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
+  t.innerHTML = msg.replace(/\n/g, "<br>");
   t.classList.add("show");
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
 }
 
 document.querySelectorAll(".nav-btn").forEach(btn => {
