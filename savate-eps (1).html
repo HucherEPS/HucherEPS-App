@@ -1,0 +1,2696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Boxe - SBF | Arbitrage &amp; Jugement EPS</title>
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --red-border: #fca5a5;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --blue-border: #93c5fd;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --yellow-bg: #fef9c3;
+    --yellow-text: #a16207;
+    --yellow-border: #eab308;
+    --purple: #7c3aed;
+    --purple-light: #f3e8ff;
+    --purple-border: #a78bfa;
+    --dark: #1e293b;
+    --radius: clamp(8px, 1.5vw, 12px);
+    --header-h: clamp(48px, 7vh, 58px);
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    font-size: clamp(12px, 1.8vw, 15px);
+  }
+
+  /* Barre de navigation supérieure adaptative */
+  header {
+    height: var(--header-h);
+    background: var(--dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(6px, 1.5vw, 14px);
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 20;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 1vw, 10px);
+    flex-shrink: 0;
+  }
+
+  .brand svg {
+    width: clamp(28px, 4.5vw, 40px);
+    height: clamp(28px, 4.5vw, 40px);
+  }
+
+  .brand-title {
+    font-weight: 800;
+    font-size: clamp(0.9rem, 2.2vw, 1.15rem);
+    letter-spacing: 0.3px;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .brand-sub {
+    font-size: clamp(0.62rem, 1.1vw, 0.72rem);
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  nav {
+    display: flex;
+    gap: clamp(3px, 0.8vw, 6px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.1);
+    color: #e2e8f0;
+    border: none;
+    border-radius: 9px;
+    padding: clamp(6px, 1vh, 10px) clamp(8px, 1.5vw, 14px);
+    font-size: clamp(0.75rem, 1.6vw, 0.92rem);
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    min-height: clamp(34px, 5vh, 42px);
+    touch-action: manipulation;
+  }
+
+  .nav-btn.active {
+    background: #38bdf8;
+    color: #0f172a;
+  }
+
+  main {
+    height: calc(100dvh - var(--header-h));
+    position: relative;
+  }
+
+  .view {
+    display: none;
+    height: 100%;
+    width: 100%;
+  }
+
+  .view.active {
+    display: block;
+  }
+
+  .scroll-view {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: clamp(10px, 2vw, 16px);
+  }
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 16px);
+    padding-bottom: 40px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(10px, 2vw, 16px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .card h2 {
+    margin: 0 0 10px 0;
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  label.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  input[type="text"], input[type="date"], input[type="number"] {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: var(--text);
+    user-select: text;
+    min-height: 44px;
+    width: 100%;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1.8vw, 16px);
+    font-size: clamp(0.8rem, 1.6vw, 0.94rem);
+    font-weight: 700;
+    cursor: pointer;
+    min-height: clamp(38px, 5.5vh, 46px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    touch-action: manipulation;
+    transition: transform 0.06s ease, opacity 0.15s ease;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-purple { background: var(--purple); color: #fff; }
+  .btn-outline { background: #fff; color: var(--dark); border: 2px solid var(--border); }
+  .btn-sm { min-height: clamp(34px, 4.8vh, 40px); padding: 6px 10px; font-size: clamp(0.75rem, 1.5vw, 0.85rem); }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+  }
+
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: #f8fafc;
+    cursor: pointer;
+    min-height: 48px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+
+  .toggle-item.on {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: #14532d;
+  }
+
+  .toggle-item.grave.on {
+    border-color: var(--red);
+    background: var(--red-light);
+    color: #991b1b;
+  }
+
+  .toggle-item input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--green);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .toggle-item.grave input { accent-color: var(--red); }
+
+  .student-row {
+    display: grid;
+    grid-template-columns: 34px 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .student-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  /* =========================================================
+     VUE ASSAUT : ÉCRAN FIXE SANS SCROLL (MOBILE + IPAD)
+     ========================================================= */
+  #view-assaut.active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: clamp(4px, 1vw, 8px);
+    gap: clamp(4px, 0.9vh, 8px);
+  }
+
+  .rotation-done-banner {
+    display: none;
+    background: #dcfce7;
+    border: 2px solid var(--green);
+    color: #14532d;
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    font-weight: 800;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  .rotation-done-banner.show { display: flex; }
+
+  .assaut-top {
+    display: grid;
+    grid-template-columns: 1.15fr auto 1.15fr;
+    align-items: center;
+    gap: clamp(4px, 1vw, 8px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(5px, 0.9vh, 8px) clamp(6px, 1.2vw, 12px);
+    flex-shrink: 0;
+  }
+
+  .roles-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: clamp(0.68rem, 1.3vw, 0.82rem);
+  }
+
+  .role-pill {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .role-pill.done-pill {
+    background: #16a34a;
+    border-color: #15803d;
+    color: #fff;
+    font-weight: 800;
+  }
+
+  .role-pill.sd-pill {
+    background: var(--purple-light);
+    border-color: var(--purple);
+    color: var(--purple);
+    font-weight: 800;
+  }
+
+  .chrono-box {
+    display: flex;
+    align-items: center;
+    gap: clamp(4px, 0.8vw, 6px);
+    background: var(--dark);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .chrono-display {
+    font-size: clamp(1.2rem, 2.8vw, 1.75rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    min-width: clamp(58px, 7vw, 78px);
+    text-align: center;
+  }
+
+  .chrono-display.warning { color: #fbbf24; }
+  .chrono-display.ended { color: #f87171; }
+
+  .chrono-status-tag {
+    font-size: clamp(0.62rem, 1.1vw, 0.72rem);
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #334155;
+    color: #cbd5e1;
+    white-space: nowrap;
+  }
+
+  .chrono-status-tag.running { background: #16a34a; color: #fff; }
+  .chrono-status-tag.grace { background: #d97706; color: #fff; }
+  .chrono-status-tag.locked { background: #dc2626; color: #fff; }
+
+  .chrono-btn {
+    min-height: clamp(32px, 4.8vh, 42px);
+    min-width: clamp(32px, 4.8vh, 42px);
+    padding: 0 8px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 800;
+    font-size: clamp(0.75rem, 1.4vw, 0.85rem);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .chrono-btn.extra-btn {
+    background: #0284c7;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .assaut-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .fighters-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(5px, 1.2vw, 10px);
+  }
+
+  .fighter-panel {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    border: 2.5px solid transparent;
+    padding: clamp(5px, 1vw, 10px);
+    gap: clamp(4px, 0.8vh, 8px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .fighter-panel.red {
+    background: var(--red-light);
+    border-color: var(--red-border);
+  }
+
+  .fighter-panel.blue {
+    background: var(--blue-light);
+    border-color: var(--blue-border);
+  }
+
+  .fighter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .fighter-name {
+    font-size: clamp(0.88rem, 2vw, 1.2rem);
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fighter-panel.red .fighter-name { color: var(--red); }
+  .fighter-panel.blue .fighter-name { color: var(--blue); }
+
+  .score-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .warn-banner {
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(0.62rem, 1.1vw, 0.76rem);
+    padding: 3px 7px;
+    border-radius: 7px;
+    text-transform: uppercase;
+    display: none;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .warn-banner.show { display: inline-flex; }
+  .warn-banner.dq { background: #dc2626; }
+
+  .score-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2px clamp(6px, 1.2vw, 12px);
+    text-align: center;
+    border: 2px solid var(--border);
+    min-width: clamp(44px, 6vw, 66px);
+  }
+
+  .score-val {
+    font-size: clamp(1.1rem, 2.6vw, 1.65rem);
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .score-lbl {
+    font-size: clamp(0.55rem, 0.9vw, 0.68rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .fault-badge {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    color: #92400e;
+    border-radius: 8px;
+    padding: 2px clamp(5px, 1vw, 10px);
+    text-align: center;
+    min-width: clamp(40px, 5vw, 56px);
+  }
+
+  /* Scène interactive avec bonhomme animé en arrière-plan */
+  .boxer-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(5px, 1vh, 10px) clamp(4px, 0.8vw, 8px);
+    gap: clamp(4px, 0.8vh, 8px);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  .boxer-stage.touches-locked {
+    opacity: 0.52;
+    filter: grayscale(0.65);
+  }
+
+  .boxer-stage.config-stage {
+    min-height: clamp(340px, 52vh, 430px);
+    background: #f8fafc;
+    border: 2px solid var(--border);
+    padding: clamp(8px, 1.5vw, 14px);
+    gap: clamp(6px, 1.2vh, 12px);
+  }
+
+  .boxer-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+    padding: 6px;
+  }
+
+  .boxer-svg {
+    height: 100%;
+    max-width: 100%;
+    opacity: 0.28;
+    animation: boxerGuard 1.8s ease-in-out infinite;
+    transform-origin: center bottom;
+  }
+
+  @keyframes boxerGuard {
+    0%, 100% { transform: translateY(0px) scaleY(1); }
+    50% { transform: translateY(-6px) scaleY(1.015); }
+  }
+
+  .boxer-svg .gloves-anim {
+    animation: glovesBob 1.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes glovesBob {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .zone-row {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: clamp(3px, 0.8vw, 8px);
+    align-items: center;
+  }
+
+  .zone-row.zone-head { grid-template-columns: 0.88fr 1.24fr 0.88fr; }
+  .zone-row.zone-mid  { grid-template-columns: 1fr 1fr 1fr; }
+  .zone-row.zone-low  { grid-template-columns: 1fr 0.3fr 1fr; }
+
+  .zone-btn {
+    position: relative;
+    height: 100%;
+    min-height: 44px;
+    border-radius: clamp(8px, 1.2vw, 12px);
+    border: 2px solid rgba(15, 23, 42, 0.16);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(2px);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 2px;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.06s ease, background 0.12s ease;
+    overflow: hidden;
+  }
+
+  .zone-btn:active {
+    transform: scale(0.95);
+    background: #e2e8f0;
+  }
+
+  .zone-btn.hidden-slot {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .zone-btn.sd-zone {
+    background: var(--purple-light) !important;
+    border: 3px solid var(--purple) !important;
+    color: #4c1d95 !important;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+  }
+
+  .zone-btn.sd-zone .touch-pts {
+    background: var(--purple) !important;
+    color: #fff !important;
+  }
+
+  .cfg-zone-card {
+    position: relative;
+    height: 100%;
+    min-height: 98px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: rgba(226, 232, 240, 0.88);
+    color: #475569;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    gap: 4px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+
+  .cfg-zone-card.active {
+    background: rgba(220, 252, 231, 0.92);
+    border-color: var(--green);
+    color: #14532d;
+  }
+
+  .cfg-zone-card.sd-target {
+    background: rgba(243, 232, 255, 0.95) !important;
+    border: 3px solid var(--purple) !important;
+    color: #4c1d95 !important;
+  }
+
+  .cfg-weight-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .cfg-pm-btn {
+    width: clamp(26px, 4vw, 34px);
+    height: clamp(26px, 4vw, 34px);
+    border-radius: 7px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: #fff;
+    color: var(--dark);
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  .cfg-pm-btn:active { background: #e2e8f0; }
+
+  .cfg-pts-val {
+    font-weight: 900;
+    font-size: clamp(0.78rem, 1.5vw, 0.94rem);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .cfg-sd-pick {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    border: 1px solid var(--purple-border);
+    background: #fff;
+    border-radius: 7px;
+    padding: 2px 5px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .cfg-sd-pick.selected {
+    background: var(--purple);
+    color: #fff;
+    border-color: var(--purple);
+  }
+
+  .sd-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 2px solid var(--border);
+    margin-bottom: 10px;
+  }
+
+  .sd-controls.active {
+    background: var(--purple-light);
+    border-color: var(--purple);
+  }
+
+  .touch-subtotal {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: clamp(0.56rem, 1vw, 0.72rem);
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+  }
+
+  .fighter-panel.red .touch-subtotal.has-pts  { background: var(--red); color: #fff; }
+  .fighter-panel.blue .touch-subtotal.has-pts { background: var(--blue); color: #fff; }
+  .zone-btn.sd-zone .touch-subtotal { background: var(--purple) !important; color: #fff !important; }
+
+  .touch-tech {
+    font-size: clamp(0.68rem, 1.6vw, 0.96rem);
+    font-weight: 800;
+    line-height: 1.08;
+    text-align: center;
+  }
+
+  .touch-zone {
+    font-size: clamp(0.58rem, 1.1vw, 0.72rem);
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .touch-pts {
+    margin-top: 2px;
+    font-size: clamp(0.62rem, 1.2vw, 0.8rem);
+    font-weight: 900;
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .fighter-panel.red .touch-pts  { background: #fee2e2; color: var(--red); }
+  .fighter-panel.blue .touch-pts { background: #dbeafe; color: var(--blue); }
+
+  .fighter-footer {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: clamp(4px, 0.8vw, 8px);
+    flex-shrink: 0;
+  }
+
+  .fault-trigger {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    min-height: clamp(38px, 5.5vh, 48px);
+    font-size: clamp(0.72rem, 1.5vw, 0.95rem);
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+    padding: 4px 6px;
+  }
+
+  .undo-btn {
+    background: #fff;
+    color: var(--dark);
+    border: 2px solid var(--border);
+    border-radius: 9px;
+    min-height: clamp(38px, 5.5vh, 48px);
+    font-size: clamp(0.7rem, 1.4vw, 0.88rem);
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    padding: 4px 6px;
+  }
+
+  /* Modales */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    z-index: 50;
+  }
+
+  .modal-backdrop.open { display: flex; }
+
+  .modal-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 740px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding: clamp(12px, 2.5vw, 18px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .fault-section-title {
+    margin: 12px 0 8px 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted);
+  }
+
+  .fault-section-title.grave {
+    color: var(--red);
+    border-top: 2px solid var(--red-border);
+    padding-top: 10px;
+  }
+
+  .fault-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px;
+    margin: 8px 0 12px 0;
+  }
+
+  .fault-opt-btn {
+    background: var(--amber-light);
+    border: 2px solid #f59e0b;
+    color: #78350f;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: left;
+    min-height: 68px;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .fault-opt-btn:active { background: #fde68a; }
+
+  .fault-opt-btn.grave {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: #991b1b;
+  }
+
+  .fault-opt-btn.grave:active { background: #fecaca; }
+
+  .fault-icon-box {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    background: #fff;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .fault-opt-btn.grave .fault-icon-box {
+    border-color: var(--red-border);
+    font-size: 1.5rem;
+  }
+
+  @keyframes animVert { 0%, 100% { transform: rotate(25deg); } 50% { transform: rotate(-18deg); } }
+  @keyframes animClap { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  @keyframes animHead { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(12deg); } }
+  @keyframes animCross { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+  @keyframes animPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+  .svg-anim-vert  { transform-origin: 26px 30px; animation: animVert 1.4s ease-in-out infinite; }
+  .svg-anim-clap  { animation: animClap 0.9s ease-in-out infinite; }
+  .svg-anim-head  { transform-origin: 30px 44px; animation: animHead 1.4s ease-in-out infinite; }
+  .svg-anim-cross { transform-origin: 30px 30px; animation: animCross 1.3s ease-in-out infinite; }
+  .svg-anim-pulse { animation: animPulse 1.2s ease-in-out infinite; }
+
+  /* Tableaux de bilan */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(0.75rem, 1.4vw, 0.88rem);
+  }
+
+  th, td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: var(--dark);
+    white-space: nowrap;
+  }
+
+  td:first-child, th:first-child { text-align: left; font-weight: 700; }
+
+  .th-group-tech {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 2px solid #7dd3fc;
+    border-bottom: 2px solid #38bdf8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .th-group-zone {
+    background: #dcfce7;
+    color: #15803d;
+    border: 2px solid #86efac;
+    border-bottom: 2px solid #22c55e;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .th-faults-yellow {
+    background: var(--yellow-bg) !important;
+    color: var(--yellow-text) !important;
+    border-bottom: 2px solid var(--yellow-border);
+  }
+
+  .fault-yellow-pill {
+    color: var(--yellow-text);
+    background: var(--yellow-bg);
+    border: 1px solid var(--yellow-border);
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  .pill-ok {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.76rem;
+  }
+
+  .pill-no {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.76rem;
+  }
+
+  .dq-fault {
+    color: #dc2626;
+    font-weight: 900;
+    background: #fee2e2;
+    padding: 2px 7px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sd-score {
+    color: #5b21b6;
+    font-weight: 900;
+    background: var(--purple-light);
+    border: 1px solid var(--purple);
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Messages d'information centrés */
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+    background: rgba(15, 23, 42, 0.94);
+    color: #fff;
+    padding: clamp(14px, 2.5vw, 20px) clamp(18px, 3vw, 30px);
+    border-radius: 16px;
+    border: 3px solid #38bdf8;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    font-weight: 800;
+    font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 120;
+    text-align: center;
+    max-width: 88vw;
+    line-height: 1.35;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* Adaptation spécifique Smartphone (portrait & petits écrans) */
+  @media (max-width: 760px) {
+    .brand-sub { display: none; }
+    .assaut-top {
+      grid-template-columns: 1fr;
+      padding: 5px 6px;
+      gap: 4px;
+    }
+    .roles-strip { justify-content: center; }
+    .assaut-actions { justify-content: center; }
+    .fighter-header { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fichier audio local LaSonotheque (cloche-de-boxe.mp3) avec repli automatique hors ligne -->
+<audio id="bell-audio" preload="auto" src="cloche-de-boxe.mp3"></audio>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-label="Logo Boxe SBF">
+      <circle cx="32" cy="32" r="30" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+      <path d="M10 48 Q32 58 54 48" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+      <path d="M22 52 Q32 56 42 52" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      <path d="M38 51 Q46 52 54 48" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+      <path d="M18 24 C18 16, 30 14, 34 20 C36 23, 35 29, 31 32 L22 32 C19 32, 18 28, 18 24 Z" fill="#dc2626"/>
+      <rect x="20" y="32" width="11" height="5" rx="2" fill="#f8fafc"/>
+      <path d="M35 36 L49 23 C52 21, 55 24, 53 27 L44 38 C41 41, 37 41, 35 36 Z" fill="#38bdf8"/>
+    </svg>
+    <div>
+      <div class="brand-title">Boxe - SBF</div>
+      <div class="brand-sub">Arbitrage &amp; Jugement EPS</div>
+    </div>
+  </div>
+
+  <nav>
+    <button class="nav-btn active" data-view="assaut">🥊 Assaut</button>
+    <button class="nav-btn" data-view="groupe">👥 Groupe</button>
+    <button class="nav-btn" data-view="reglages">⚙️ Paramétrage</button>
+    <button class="nav-btn" data-view="bilan">📊 Bilan</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. VUE ASSAUT (ÉCRAN FIXE SANS SCROLL) -->
+  <section id="view-assaut" class="view active">
+    <div class="rotation-done-banner" id="rotation-done-banner">
+      <span>✅ Rotation terminée ! Passez par le Bilan pour rejouer un assaut ou réinitialisez la séance.</span>
+      <button class="btn btn-success btn-sm" onclick="switchView('bilan')">📊 Bilan</button>
+    </div>
+
+    <div class="assaut-top">
+      <div class="roles-strip" id="assaut-roles"></div>
+
+      <div class="chrono-box">
+        <span class="chrono-display" id="chrono-display">01:30</span>
+        <span class="chrono-status-tag" id="chrono-status">Non démarré</span>
+        <button class="chrono-btn" id="btn-chrono-toggle" style="background:#22c55e;color:#052e16;">▶</button>
+        <button class="chrono-btn" id="btn-chrono-reset" style="background:#475569;color:#fff;">↺</button>
+        <button class="chrono-btn extra-btn" id="btn-chrono-extra" title="Ajouter 10 secondes">+10s Extra</button>
+      </div>
+
+      <div class="assaut-actions">
+        <button class="btn btn-success btn-sm" id="btn-save-assaut">✓ Valider</button>
+        <button class="btn btn-outline btn-sm" id="btn-next-rotation">Suivant ⏭</button>
+      </div>
+    </div>
+
+    <div class="fighters-grid">
+      <div class="fighter-panel red">
+        <div class="fighter-header">
+          <div class="fighter-name" id="name-red">Élève 1</div>
+          <div class="score-group">
+            <span class="warn-banner" id="warn-red">⚠️ Avert.</span>
+            <div class="fault-badge">
+              <div class="score-val" id="faults-red" style="font-size:clamp(0.95rem,2vw,1.25rem);">0</div>
+              <div class="score-lbl">Fautes</div>
+            </div>
+            <div class="score-box">
+              <div class="score-val" id="score-red">0</div>
+              <div class="score-lbl">Points</div>
+            </div>
+          </div>
+        </div>
+        <div class="boxer-stage" id="stage-red"></div>
+        <div class="fighter-footer">
+          <button class="fault-trigger" onclick="openFaultModal('red')">⚠️ Faute (R)</button>
+          <button class="undo-btn" onclick="undoLastAction('red')">↩ Annuler</button>
+        </div>
+      </div>
+
+      <div class="fighter-panel blue">
+        <div class="fighter-header">
+          <div class="fighter-name" id="name-blue">Élève 2</div>
+          <div class="score-group">
+            <span class="warn-banner" id="warn-blue">⚠️ Avert.</span>
+            <div class="fault-badge">
+              <div class="score-val" id="faults-blue" style="font-size:clamp(0.95rem,2vw,1.25rem);">0</div>
+              <div class="score-lbl">Fautes</div>
+            </div>
+            <div class="score-box">
+              <div class="score-val" id="score-blue">0</div>
+              <div class="score-lbl">Points</div>
+            </div>
+          </div>
+        </div>
+        <div class="boxer-stage" id="stage-blue"></div>
+        <div class="fighter-footer">
+          <button class="fault-trigger" onclick="openFaultModal('blue')">⚠️ Faute (B)</button>
+          <button class="undo-btn" onclick="undoLastAction('blue')">↩ Annuler</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. VUE GROUPE & ROTATIONS -->
+  <section id="view-groupe" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>Informations de la séance</h2>
+        <div class="grid-3">
+          <label class="field">Groupe / Enceinte
+            <input type="text" id="meta-group" placeholder="Ex : Ring 1 - 4eB">
+          </label>
+          <label class="field">Date
+            <input type="date" id="meta-date">
+          </label>
+          <label class="field">Autre donnée (Leçon, thème…)
+            <input type="text" id="meta-other" placeholder="Ex : Leçon 3 - Enchaînements">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>Élèves du groupe (4 à 6 élèves)</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" id="btn-remove-student">− Élève</button>
+            <button class="btn btn-primary btn-sm" id="btn-add-student">+ Élève</button>
+          </div>
+        </h2>
+        <div id="students-list"></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-success" id="btn-apply-students">Enregistrer et générer les rotations équilibrées</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ordre des rotations équilibrées (avec récupération)</h2>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:0.88rem;">
+          Les assauts sont ordonnés pour espacer au maximum les reprises de chaque élève.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Assaut</th>
+                <th>Tireur Rouge</th>
+                <th>Tireur Bleu</th>
+                <th>Arbitre</th>
+                <th>Contre-arbitre</th>
+                <th>Juge(s)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rotations-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. VUE PARAMÉTRAGE -->
+  <section id="view-reglages" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>Durée d'une reprise</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="setDuration(60)">1 min</button>
+          <button class="btn btn-outline btn-sm" onclick="setDuration(90)">1 min 30</button>
+          <button class="btn btn-outline btn-sm" onclick="setDuration(120)">2 min</button>
+          <label class="field" style="flex-direction:row;align-items:center;gap:8px;">
+            Secondes :
+            <input type="number" id="input-duration" min="15" max="300" step="5" style="width:90px;">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>Techniques, zones de touches &amp; barème (1 à 10 pts)</span>
+          <button class="btn btn-sm" id="btn-toggle-sd">💀 Mode mort subite : OFF</button>
+        </h2>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:0.88rem;">
+          Touchez une zone pour l'activer (vert) ou la masquer (gris). Utilisez <strong>− / +</strong> pour ajuster sa valeur en points.
+        </p>
+
+        <div class="sd-controls" id="sd-controls" style="display:none;">
+          <span style="font-weight:800;color:var(--purple);">💀 Mode mort subite actif :</span>
+          <span style="font-size:0.88rem;">Touchez le bouton <strong>💀</strong> sur une zone active pour la définir comme cible prioritaire.</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span style="font-weight:700;font-size:0.86rem;">Touches pour gagner :</span>
+            <button class="cfg-pm-btn" onclick="changeSDTargetCount(-1)">−</button>
+            <span class="cfg-pts-val" id="sd-target-count">3</span>
+            <button class="cfg-pm-btn" onclick="changeSDTargetCount(1)">+</button>
+          </div>
+        </div>
+
+        <div class="boxer-stage config-stage" id="config-boxer-stage"></div>
+      </div>
+
+      <div class="card">
+        <h2>Fautes actives pour l'arbitrage</h2>
+        <div class="toggle-grid" id="config-faults"></div>
+
+        <h3 class="fault-section-title grave">⛔ Fautes graves (Disqualification immédiate)</h3>
+        <div class="toggle-grid" id="config-grave-faults"></div>
+      </div>
+
+      <div class="card">
+        <h2>Gestion des données</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-danger" id="btn-reset-all">Réinitialiser la séance</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. VUE BILAN -->
+  <section id="view-bilan" class="view scroll-view">
+    <div class="container">
+      <div class="card">
+        <h2>
+          <span>Tableau récapitulatif cumulatif par élève</span>
+          <button class="btn btn-primary btn-sm" id="btn-export-csv">⬇ Exporter CSV</button>
+        </h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th rowspan="2">Élève</th>
+                <th rowspan="2">Assauts</th>
+                <th rowspan="2">Score Total</th>
+                <th rowspan="2" class="th-faults-yellow">Fautes</th>
+                <th colspan="4" class="th-group-tech">Techniques</th>
+                <th colspan="3" class="th-group-zone">Zones de touches</th>
+                <th rowspan="2">Variété Pieds/Poings</th>
+              </tr>
+              <tr>
+                <th>Direct</th>
+                <th>Crochet</th>
+                <th>Chassé</th>
+                <th>Fouetté</th>
+                <th>Basse</th>
+                <th>Médiane</th>
+                <th>Tête</th>
+              </tr>
+            </thead>
+            <tbody id="summary-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Historique des rencontres enregistrées</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tireur Rouge</th>
+                <th>Score</th>
+                <th>Tireur Bleu</th>
+                <th>Score</th>
+                <th>Fautes (R / B)</th>
+                <th>Touches (R / B)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Modales -->
+<div class="modal-backdrop" id="fault-modal">
+  <div class="modal-card">
+    <h2 id="fault-modal-title" style="margin:0;">Signaler une faute</h2>
+    <p style="margin:6px 0 0 0;color:var(--muted);font-size:0.88rem;">
+      Gestuelle officielle d'arbitrage Savate Boxe française : sélectionnez la faute observée.
+    </p>
+    <div class="fault-section-title">Fautes techniques / réglementaires</div>
+    <div class="fault-options" id="fault-options"></div>
+
+    <div class="fault-section-title grave">⛔ Fautes graves (Disqualification immédiate)</div>
+    <div class="fault-options" id="grave-fault-options"></div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-outline" onclick="closeFaultModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="dq-modal">
+  <div class="modal-card" style="max-width:520px;border:3px solid #dc2626;">
+    <h2 id="dq-modal-title" style="margin:0;color:#dc2626;">⚠️ Confirmation de disqualification</h2>
+    <p id="dq-modal-text" style="margin:12px 0;font-size:1rem;line-height:1.45;"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn btn-outline" onclick="cancelDisqualification()">Annuler la faute</button>
+      <button class="btn btn-danger" onclick="confirmDisqualification()">Confirmer la disqualification</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="sd-modal">
+  <div class="modal-card" style="max-width:520px;border:3px solid #7c3aed;">
+    <h2 style="margin:0;color:#7c3aed;">💀 Victoire par mort subite ?</h2>
+    <p id="sd-modal-text" style="margin:12px 0;font-size:1rem;line-height:1.45;"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn btn-outline" onclick="cancelSuddenDeath()">↩ Annuler le dernier coup</button>
+      <button class="btn btn-purple" onclick="confirmSuddenDeath()">✓ Confirmer la victoire</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "savate_eps_v6";
+
+const TOUCH_COMBOS = {
+  crochet_g:       { id: "crochet_g",       tech: "crochet", zone: "tete",    zoneLabel: "Tête G",  defaultPts: 2, label: "Crochet G" },
+  direct_tete:     { id: "direct_tete",     tech: "direct",  zone: "tete",    zoneLabel: "Front",   defaultPts: 2, label: "Direct" },
+  crochet_d:       { id: "crochet_d",       tech: "crochet", zone: "tete",    zoneLabel: "Tête D",  defaultPts: 2, label: "Crochet D" },
+  fouette_mediane: { id: "fouette_mediane", tech: "fouette", zone: "mediane", zoneLabel: "Médiane", defaultPts: 2, label: "Fouetté" },
+  direct_mediane:  { id: "direct_mediane",  tech: "direct",  zone: "mediane", zoneLabel: "Médiane", defaultPts: 1, label: "Direct" },
+  chasse_mediane:  { id: "chasse_mediane",  tech: "chasse",  zone: "mediane", zoneLabel: "Médiane", defaultPts: 2, label: "Chassé" },
+  fouette_basse:   { id: "fouette_basse",   tech: "fouette", zone: "basse",   zoneLabel: "Basse",   defaultPts: 1, label: "Fouetté" },
+  chasse_basse:    { id: "chasse_basse",    tech: "chasse",  zone: "basse",   zoneLabel: "Basse",   defaultPts: 1, label: "Chassé" }
+};
+
+const FAULTS = [
+  { id: "zone_interdite",      label: "Zone interdite" },
+  { id: "puissance_excessive", label: "Puissance excessive" },
+  { id: "hors_zone",           label: "Touches hors zone" },
+  { id: "accrochage",          label: "Accrochage" },
+  { id: "tete_en_avant",       label: "Boxe tête en avant" },
+  { id: "trajectoire_vert",    label: "Trajectoire verticale" },
+  { id: "fair_play",           label: "Non-respect des ordres / fair-play" }
+];
+
+const GRAVE_FAULTS = [
+  { id: "coup_violent",   label: "Coup volontaire violent et/ou dangereux" },
+  { id: "hors_combat",    label: "Coup interdit mettant l'adversaire hors combat" },
+  { id: "insulte",        label: "Insulte envers l'adversaire, l'arbitre, les juges, le public..." }
+];
+
+function getFaultGestureSVG(faultId) {
+  const baseHead = `<circle cx="30" cy="13" r="6" fill="#334155"/>`;
+  const baseTorso = `<path d="M21 21 L39 21 L37 42 L23 42 Z" fill="#64748b"/><rect x="23" y="42" width="14" height="12" fill="#0f172a"/>`;
+  switch (faultId) {
+    case "zone_interdite":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">${baseHead}${baseTorso}
+        <g class="svg-anim-cross">
+          <line x1="16" y1="22" x2="44" y2="34" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
+          <line x1="44" y1="22" x2="16" y2="34" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
+        </g></svg>`;
+    case "puissance_excessive":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">${baseHead}${baseTorso}
+        <g class="svg-anim-clap">
+          <path d="M21 23 L13 13 L26 6" fill="none" stroke="#d97706" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M39 23 L47 13 L34 6" fill="none" stroke="#d97706" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="30" cy="5" r="3" fill="#dc2626"/>
+        </g></svg>`;
+    case "hors_zone":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">${baseHead}${baseTorso}
+        <g class="svg-anim-pulse">
+          <line x1="18" y1="28" x2="42" y2="28" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/>
+          <line x1="21" y1="41" x2="39" y2="41" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+        </g></svg>`;
+    case "accrochage":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">${baseHead}${baseTorso}
+        <g class="svg-anim-cross">
+          <path d="M18 24 L16 35 L40 35" fill="none" stroke="#b45309" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M42 24 L44 35 L20 35" fill="none" stroke="#d97706" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g></svg>`;
+    case "tete_en_avant":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">
+        <rect x="25" y="42" width="14" height="12" fill="#0f172a"/>
+        <g class="svg-anim-head">
+          <path d="M26 42 L20 24 L34 22 L38 42 Z" fill="#64748b"/>
+          <circle cx="22" cy="15" r="6" fill="#334155"/>
+          <path d="M22 25 L11 19 L16 12" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g></svg>`;
+    case "trajectoire_vert":
+      return `<svg width="46" height="46" viewBox="0 0 60 60">
+        <circle cx="34" cy="13" r="6" fill="#334155"/>
+        <path d="M28 21 L40 21 L40 42 L28 42 Z" fill="#64748b"/>
+        <rect x="28" y="42" width="12" height="12" fill="#0f172a"/>
+        <g class="svg-anim-vert">
+          <line x1="28" y1="26" x2="8" y2="26" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+        </g>
+        <path d="M12 40 Q8 33 11 26" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2"/>
+      </svg>`;
+    case "fair_play":
+    default:
+      return `<svg width="46" height="46" viewBox="0 0 60 60">${baseHead}${baseTorso}
+        <g class="svg-anim-pulse">
+          <path d="M39 24 L44 33 L30 30" fill="none" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="29" cy="30" r="3.5" fill="#dc2626"/>
+        </g></svg>`;
+  }
+}
+
+function getDefaultCombosConfig() {
+  const cfg = {};
+  Object.values(TOUCH_COMBOS).forEach(c => {
+    cfg[c.id] = { enabled: true, pts: c.defaultPts };
+  });
+  return cfg;
+}
+
+function getDefaultState() {
+  return {
+    meta: {
+      group: "Ring 1",
+      date: new Date().toISOString().slice(0, 10),
+      other: "Séance Savate"
+    },
+    config: {
+      duration: 90,
+      combos: getDefaultCombosConfig(),
+      suddenDeath: {
+        enabled: false,
+        comboId: "direct_tete",
+        targetHits: 3
+      },
+      faults: {
+        zone_interdite: true,
+        puissance_excessive: true,
+        hors_zone: true,
+        accrochage: true,
+        tete_en_avant: true,
+        trajectoire_vert: true,
+        fair_play: true
+      },
+      graveFaults: {
+        coup_violent: true,
+        hors_combat: true,
+        insulte: true
+      }
+    },
+    students: [
+      { id: 1, prenom: "Élève 1", nom: "" },
+      { id: 2, prenom: "Élève 2", nom: "" },
+      { id: 3, prenom: "Élève 3", nom: "" },
+      { id: 4, prenom: "Élève 4", nom: "" }
+    ],
+    rotations: [],
+    currentRotationIdx: 0,
+    rotationCompleted: false,
+    customReplayMatch: null,
+    currentMatch: createEmptyMatch(),
+    history: []
+  };
+}
+
+function createEmptyMatch() {
+  return {
+    red: { score: 0, events: [], disqualified: false, suddenDeathWin: false },
+    blue: { score: 0, events: [], disqualified: false, suddenDeathWin: false }
+  };
+}
+
+let state = loadState();
+if (!state.rotations || state.rotations.length === 0) {
+  state.rotations = generateRotations(state.students);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return getDefaultState();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+function fullName(s) {
+  if (!s) return "—";
+  return `${s.prenom} ${s.nom}`.trim() || `Élève ${s.id}`;
+}
+
+function getStudentById(id) {
+  return state.students.find(s => s.id === id);
+}
+
+function getActiveRotation() {
+  if (state.customReplayMatch) return state.customReplayMatch;
+  return state.rotations[state.currentRotationIdx] || state.rotations[0];
+}
+
+function isAssautLockedByRotationEnd() {
+  return state.rotationCompleted && !state.customReplayMatch;
+}
+
+function generateRotations(students) {
+  const n = students.length;
+  const ids = students.map(s => s.id);
+  const remaining = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      remaining.push([ids[i], ids[j]]);
+    }
+  }
+
+  const orderedPairs = [];
+  const lastPlayed = {};
+  const playCount = {};
+  ids.forEach(id => {
+    lastPlayed[id] = -10;
+    playCount[id] = 0;
+  });
+
+  for (let step = 0; remaining.length > 0; step++) {
+    let bestIdx = 0;
+    let bestScore = -Infinity;
+
+    for (let i = 0; i < remaining.length; i++) {
+      const [a, b] = remaining[i];
+      const restA = step - lastPlayed[a];
+      const restB = step - lastPlayed[b];
+      const minRest = Math.min(restA, restB);
+      const score = minRest * 1000 + (restA + restB) * 20 - (playCount[a] + playCount[b]) * 5;
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+
+    const [a, b] = remaining.splice(bestIdx, 1)[0];
+    const pair = (step % 2 === 0) ? [a, b] : [b, a];
+    orderedPairs.push(pair);
+    lastPlayed[a] = step;
+    lastPlayed[b] = step;
+    playCount[a]++;
+    playCount[b]++;
+  }
+
+  return orderedPairs.map((pair, idx) => {
+    const [redId, blueId] = pair;
+    const others = ids.filter(id => id !== redId && id !== blueId);
+    const shift = idx % others.length;
+    const rotated = others.slice(shift).concat(others.slice(0, shift));
+
+    let arbitre = rotated[0] || null;
+    let contreArbitre = null;
+    let juges = [];
+
+    if (n === 4) {
+      juges = rotated.slice(1, 2);
+    } else if (n === 5) {
+      juges = rotated.slice(1, 3);
+    } else if (n >= 6) {
+      contreArbitre = rotated[1] || null;
+      juges = rotated.slice(2, 4);
+    }
+
+    return { redId, blueId, arbitre, contreArbitre, juges };
+  });
+}
+
+/* =====================================================================
+   CHRONOMÈTRE, EXTRA TIME (+10s) & CLOCHE LOCALE (cloche-de-boxe.mp3)
+   ===================================================================== */
+let timeLeft = state.config.duration;
+let timerInterval = null;
+let graceTimeout = null;
+let chronoState = "idle";
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function playBoxingBellSynth() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const partials = [
+      { freq: 784,  amp: 0.34, decay: 2.2 },
+      { freq: 1568, amp: 0.20, decay: 1.8 },
+      { freq: 2158, amp: 0.14, decay: 1.4 }
+    ];
+    partials.forEach(p => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(p.freq, now);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(p.amp, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + p.decay);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + p.decay + 0.05);
+    });
+  } catch (e) {}
+}
+
+function playBoxingBell() {
+  const bellEl = document.getElementById("bell-audio");
+  if (bellEl) {
+    try {
+      bellEl.currentTime = 0;
+      const playPromise = bellEl.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => playBoxingBellSynth());
+      }
+      return;
+    } catch (e) {}
+  }
+  playBoxingBellSynth();
+}
+
+function playBeep(freq = 660, duration = 0.16, count = 1, gap = 0.1) {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    for (let i = 0; i < count; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + i * (duration + gap));
+      gain.gain.setValueAtTime(0.28, now + i * (duration + gap));
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * (duration + gap) + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * (duration + gap));
+      osc.stop(now + i * (duration + gap) + duration);
+    }
+  } catch (e) {}
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function updateChronoUI() {
+  const el = document.getElementById("chrono-display");
+  const statusEl = document.getElementById("chrono-status");
+  const btn = document.getElementById("btn-chrono-toggle");
+  const rotLocked = isAssautLockedByRotationEnd();
+
+  el.textContent = formatTime(timeLeft);
+  el.classList.toggle("warning", timeLeft <= 10 && timeLeft > 0);
+  el.classList.toggle("ended", timeLeft === 0);
+
+  statusEl.className = "chrono-status-tag";
+  if (rotLocked) {
+    statusEl.textContent = "Rotation finie";
+    statusEl.classList.add("running");
+    btn.textContent = "▶";
+    btn.style.background = "#475569";
+  } else if (chronoState === "idle") {
+    statusEl.textContent = "Non démarré";
+    btn.textContent = "▶";
+    btn.style.background = "#22c55e";
+  } else if (chronoState === "running") {
+    statusEl.textContent = "En cours";
+    statusEl.classList.add("running");
+    btn.textContent = "❚❚";
+    btn.style.background = "#f59e0b";
+  } else if (chronoState === "paused") {
+    statusEl.textContent = "Pause";
+    btn.textContent = "▶";
+    btn.style.background = "#22c55e";
+  } else if (chronoState === "grace") {
+    statusEl.textContent = "Fin (+3s)";
+    statusEl.classList.add("grace");
+    btn.textContent = "▶";
+    btn.style.background = "#22c55e";
+  } else if (chronoState === "locked") {
+    statusEl.textContent = "Terminé";
+    statusEl.classList.add("locked");
+    btn.textContent = "▶";
+    btn.style.background = "#22c55e";
+  }
+
+  const isLocked = (chronoState === "locked") || rotLocked;
+  document.getElementById("stage-red").classList.toggle("touches-locked", isLocked);
+  document.getElementById("stage-blue").classList.toggle("touches-locked", isLocked);
+}
+
+function pauseChrono() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  if (chronoState === "running") {
+    chronoState = "paused";
+  }
+  updateChronoUI();
+}
+
+function toggleChrono() {
+  if (isAssautLockedByRotationEnd()) {
+    showToast("✅ Rotation terminée !\nRéinitialisez la séance ou rejouez un assaut depuis le Bilan.");
+    return;
+  }
+
+  if (chronoState === "running") {
+    pauseChrono();
+    return;
+  }
+
+  if (graceTimeout) {
+    clearTimeout(graceTimeout);
+    graceTimeout = null;
+  }
+
+  if (timeLeft <= 0 || chronoState === "locked" || chronoState === "grace") {
+    timeLeft = state.config.duration;
+  }
+
+  const isFreshStart = (chronoState === "idle" || timeLeft === state.config.duration);
+  chronoState = "running";
+  if (isFreshStart) {
+    playBoxingBell();
+    showToast("🔔 Début de reprise !");
+  }
+  updateChronoUI();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+
+    if (timeLeft === 10) {
+      playBeep(740, 0.14, 2, 0.08);
+      showToast("⏱️ Plus que 10 secondes !");
+    } else if (timeLeft === 3 || timeLeft === 2 || timeLeft === 1) {
+      playBeep(620, 0.12, 1);
+    } else if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(timerInterval);
+      timerInterval = null;
+      chronoState = "grace";
+      playBeep(440, 0.24, 3, 0.12);
+      showToast("Fin de reprise !\n(Touches actives encore 3 secondes)");
+      updateChronoUI();
+
+      graceTimeout = setTimeout(() => {
+        chronoState = "locked";
+        graceTimeout = null;
+        updateChronoUI();
+      }, 3000);
+      return;
+    }
+
+    updateChronoUI();
+  }, 1000);
+}
+
+function addExtraTime10s() {
+  if (isAssautLockedByRotationEnd()) {
+    showToast("✅ Rotation terminée !\nImpossible d'ajouter du temps.");
+    return;
+  }
+  if (graceTimeout) {
+    clearTimeout(graceTimeout);
+    graceTimeout = null;
+  }
+  timeLeft += 10;
+  if (chronoState === "grace" || chronoState === "locked") {
+    chronoState = "paused";
+  }
+  updateChronoUI();
+  showToast("⏱️ Extra time : +10 secondes ajoutées !");
+}
+
+function resetChrono() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  if (graceTimeout) {
+    clearTimeout(graceTimeout);
+    graceTimeout = null;
+  }
+  timeLeft = state.config.duration;
+  chronoState = "idle";
+  updateChronoUI();
+}
+
+function getBoxerSVG(side) {
+  const mainColor = side === "red" ? "#dc2626" : (side === "blue" ? "#2563eb" : "#334155");
+  const accentColor = side === "red" ? "#991b1b" : (side === "blue" ? "#1d4ed8" : "#0f172a");
+  return `
+    <svg class="boxer-svg" viewBox="0 0 220 320" aria-hidden="true">
+      <circle cx="110" cy="46" r="24" fill="${mainColor}"/>
+      <path d="M84 78 C84 72, 136 72, 136 78 L142 162 L78 162 Z" fill="${mainColor}"/>
+      <rect x="78" y="156" width="64" height="10" rx="4" fill="${accentColor}"/>
+      <g class="gloves-anim">
+        <path d="M84 86 L58 118 L74 134" fill="none" stroke="${mainColor}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M136 86 L162 118 L146 134" fill="none" stroke="${mainColor}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="76" cy="128" r="14" fill="${accentColor}"/>
+        <circle cx="144" cy="128" r="14" fill="${accentColor}"/>
+      </g>
+      <path d="M90 164 L76 238 L68 296" fill="none" stroke="${mainColor}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M130 164 L144 238 L152 296" fill="none" stroke="${mainColor}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="64" cy="302" rx="16" ry="8" fill="${accentColor}"/>
+      <ellipse cx="156" cy="302" rx="16" ry="8" fill="${accentColor}"/>
+    </svg>
+  `;
+}
+
+function getComboSubtotal(side, comboId) {
+  return state.currentMatch[side].events
+    .filter(e => e.kind === "touch" && e.comboId === comboId)
+    .reduce((sum, e) => sum + e.pts, 0);
+}
+
+function getComboHitCount(side, comboId) {
+  return state.currentMatch[side].events
+    .filter(e => e.kind === "touch" && e.comboId === comboId).length;
+}
+
+function renderZoneButton(side, comboId) {
+  const c = TOUCH_COMBOS[comboId];
+  const cfg = state.config.combos[comboId];
+  if (!cfg || !cfg.enabled) {
+    return `<div class="zone-btn hidden-slot"></div>`;
+  }
+  const subPts = getComboSubtotal(side, comboId);
+  const sd = state.config.suddenDeath;
+  const isSD = sd.enabled && sd.comboId === comboId;
+  const sdHits = isSD ? getComboHitCount(side, comboId) : 0;
+
+  return `
+    <button class="zone-btn ${isSD ? "sd-zone" : ""}" onclick="recordTouch('${side}', '${c.id}')">
+      <span class="touch-subtotal ${subPts > 0 ? "has-pts" : ""}">
+        ${isSD ? `💀 ${sdHits}/${sd.targetHits}` : `${subPts} pt${subPts > 1 ? "s" : ""}`}
+      </span>
+      <span class="touch-tech">${isSD ? "💀 " : ""}${c.label}</span>
+      <span class="touch-zone">${c.zoneLabel}</span>
+      <span class="touch-pts">+${cfg.pts} pt${cfg.pts > 1 ? "s" : ""}</span>
+    </button>
+  `;
+}
+
+function renderAssaut() {
+  const rot = getActiveRotation();
+  if (!rot) return;
+
+  const rotLocked = isAssautLockedByRotationEnd();
+  document.getElementById("rotation-done-banner").classList.toggle("show", rotLocked);
+  document.getElementById("btn-save-assaut").disabled = rotLocked;
+  document.getElementById("btn-next-rotation").disabled = rotLocked;
+
+  document.getElementById("name-red").textContent = fullName(getStudentById(rot.redId));
+  document.getElementById("name-blue").textContent = fullName(getStudentById(rot.blueId));
+
+  const rolesEl = document.getElementById("assaut-roles");
+  const jugesNames = (rot.juges || []).map(id => fullName(getStudentById(id))).join(", ");
+  let assautPill = "";
+  if (state.customReplayMatch) {
+    assautPill = `<span class="role-pill" style="background:#fef3c7;border-color:#f59e0b;color:#92400e;">🔄 Reprise rejouée</span>`;
+  } else if (state.rotationCompleted) {
+    assautPill = `<span class="role-pill done-pill">✓ Assauts terminés (${state.rotations.length}/${state.rotations.length})</span>`;
+  } else {
+    assautPill = `<span class="role-pill">Assaut ${state.currentRotationIdx + 1}/${state.rotations.length}</span>`;
+  }
+
+  const sdTag = state.config.suddenDeath.enabled
+    ? `<span class="role-pill sd-pill">💀 Mort subite (${state.config.suddenDeath.targetHits}x)</span>`
+    : "";
+
+  rolesEl.innerHTML = `
+    ${assautPill}
+    ${sdTag}
+    <span class="role-pill">Arb. : ${fullName(getStudentById(rot.arbitre))}</span>
+    ${rot.contreArbitre ? `<span class="role-pill">C-arb. : ${fullName(getStudentById(rot.contreArbitre))}</span>` : ""}
+    <span class="role-pill">Juge(s) : ${jugesNames || "—"}</span>
+  `;
+
+  ["red", "blue"].forEach(side => {
+    const data = state.currentMatch[side];
+    const faultCount = data.events.filter(e => e.kind === "fault").length;
+    document.getElementById(`score-${side}`).textContent = data.score;
+    document.getElementById(`faults-${side}`).textContent = faultCount;
+
+    const warnEl = document.getElementById(`warn-${side}`);
+    warnEl.classList.remove("show", "dq");
+    if (data.disqualified) {
+      warnEl.textContent = "⛔ Disqualifié";
+      warnEl.classList.add("show", "dq");
+    } else if (faultCount >= 2) {
+      warnEl.textContent = "⚠️ Avert.";
+      warnEl.classList.add("show");
+    }
+
+    const stage = document.getElementById(`stage-${side}`);
+    stage.innerHTML = `
+      <div class="boxer-bg">${getBoxerSVG(side)}</div>
+      <div class="zone-row zone-head">
+        ${renderZoneButton(side, "crochet_g")}
+        ${renderZoneButton(side, "direct_tete")}
+        ${renderZoneButton(side, "crochet_d")}
+      </div>
+      <div class="zone-row zone-mid">
+        ${renderZoneButton(side, "fouette_mediane")}
+        ${renderZoneButton(side, "direct_mediane")}
+        ${renderZoneButton(side, "chasse_mediane")}
+      </div>
+      <div class="zone-row zone-low">
+        ${renderZoneButton(side, "fouette_basse")}
+        <div></div>
+        ${renderZoneButton(side, "chasse_basse")}
+      </div>
+    `;
+  });
+
+  updateChronoUI();
+}
+
+let pendingSD = null;
+
+function recordTouch(side, comboId) {
+  if (isAssautLockedByRotationEnd()) {
+    showToast("✅ Rotation terminée !\nPassez par le Bilan pour rejouer un assaut ou réinitialisez.");
+    return;
+  }
+  if (chronoState === "idle") {
+    showToast("⏱️ Démarrez le chronomètre pour compter les touches !");
+    return;
+  }
+  if (chronoState === "paused") {
+    showToast("⏱️ Le chronomètre est en pause. Relancez-le pour compter.");
+    return;
+  }
+  if (chronoState === "locked") {
+    showToast("⛔ Reprise terminée (délai de 3 secondes écoulé).");
+    return;
+  }
+
+  const combo = TOUCH_COMBOS[comboId];
+  const cfg = state.config.combos[comboId];
+  if (!combo || !cfg || !cfg.enabled) return;
+
+  state.currentMatch[side].score += cfg.pts;
+  state.currentMatch[side].events.push({
+    kind: "touch",
+    comboId: combo.id,
+    tech: combo.tech,
+    zone: combo.zone,
+    pts: cfg.pts
+  });
+  saveState();
+  renderAssaut();
+
+  const sd = state.config.suddenDeath;
+  if (sd.enabled && sd.comboId === comboId) {
+    const hits = getComboHitCount(side, comboId);
+    if (hits >= sd.targetHits) {
+      pauseChrono();
+      playBeep(880, 0.18, 2, 0.08);
+      const rot = getActiveRotation();
+      const winnerName = fullName(getStudentById(side === "red" ? rot.redId : rot.blueId));
+      pendingSD = { side, winnerName };
+      document.getElementById("sd-modal-text").innerHTML =
+        `<strong>${winnerName}</strong> vient d'atteindre <strong>${sd.targetHits} touche${sd.targetHits > 1 ? "s" : ""}</strong> sur la zone prioritaire (<em>${combo.label} — ${combo.zoneLabel}</em>).<br><br>Confirmez-vous la victoire immédiate par <strong>mort subite</strong> ?`;
+      document.getElementById("sd-modal").classList.add("open");
+    }
+  }
+}
+
+function cancelSuddenDeath() {
+  if (!pendingSD) return;
+  const { side } = pendingSD;
+  pendingSD = null;
+  document.getElementById("sd-modal").classList.remove("open");
+  const ev = state.currentMatch[side].events.pop();
+  if (ev && ev.kind === "touch") {
+    state.currentMatch[side].score = Math.max(0, state.currentMatch[side].score - ev.pts);
+  }
+  saveState();
+  renderAssaut();
+  showToast("↩ Dernier coup annulé. Vous pouvez relancer le chronomètre.");
+}
+
+function confirmSuddenDeath() {
+  if (!pendingSD) return;
+  const { side, winnerName } = pendingSD;
+  pendingSD = null;
+  document.getElementById("sd-modal").classList.remove("open");
+  playBoxingBell();
+  state.currentMatch[side].suddenDeathWin = true;
+  saveCurrentAssaut("sudden_death", winnerName);
+}
+
+function undoLastAction(side) {
+  if (isAssautLockedByRotationEnd()) return;
+  const ev = state.currentMatch[side].events.pop();
+  if (!ev) {
+    showToast("Aucune action à annuler");
+    return;
+  }
+  if (ev.kind === "touch") {
+    state.currentMatch[side].score = Math.max(0, state.currentMatch[side].score - ev.pts);
+  }
+  if (ev.kind === "fault") {
+    state.currentMatch[side].disqualified = false;
+  }
+  saveState();
+  renderAssaut();
+  showToast("Dernière action annulée");
+}
+
+let faultTargetSide = null;
+let pendingDQ = null;
+
+function openFaultModal(side) {
+  if (isAssautLockedByRotationEnd()) {
+    showToast("✅ Rotation terminée !\nPassez par le Bilan pour rejouer un assaut.");
+    return;
+  }
+  faultTargetSide = side;
+  const rot = getActiveRotation();
+  const student = getStudentById(side === "red" ? rot.redId : rot.blueId);
+  document.getElementById("fault-modal-title").textContent =
+    `Faute pour ${fullName(student)} (${side === "red" ? "Rouge" : "Bleu"})`;
+
+  const container = document.getElementById("fault-options");
+  const activeFaults = FAULTS.filter(f => state.config.faults[f.id]);
+  if (activeFaults.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted);">Aucune faute activée dans Paramétrage.</p>`;
+  } else {
+    container.innerHTML = activeFaults.map(f => `
+      <button class="fault-opt-btn" onclick="recordFault('${f.id}', false)">
+        <span class="fault-icon-box">${getFaultGestureSVG(f.id)}</span>
+        <span>${f.label}</span>
+      </button>
+    `).join("");
+  }
+
+  const graveContainer = document.getElementById("grave-fault-options");
+  const activeGraves = GRAVE_FAULTS.filter(f => state.config.graveFaults[f.id]);
+  if (activeGraves.length === 0) {
+    graveContainer.innerHTML = `<p style="color:var(--muted);">Aucune faute grave activée dans Paramétrage.</p>`;
+  } else {
+    graveContainer.innerHTML = activeGraves.map(f => `
+      <button class="fault-opt-btn grave" onclick="recordFault('${f.id}', true)">
+        <span class="fault-icon-box">⛔</span>
+        <span>${f.label}</span>
+      </button>
+    `).join("");
+  }
+
+  document.getElementById("fault-modal").classList.add("open");
+}
+
+function closeFaultModal() {
+  document.getElementById("fault-modal").classList.remove("open");
+}
+
+function recordFault(faultId, isGrave) {
+  if (!faultTargetSide) return;
+  const currentFaults = state.currentMatch[faultTargetSide].events.filter(e => e.kind === "fault").length;
+
+  if (isGrave || currentFaults + 1 >= 3) {
+    closeFaultModal();
+    pauseChrono();
+    pendingDQ = { side: faultTargetSide, faultId, isGrave };
+    const rot = getActiveRotation();
+    const student = getStudentById(faultTargetSide === "red" ? rot.redId : rot.blueId);
+    const fObj = isGrave
+      ? GRAVE_FAULTS.find(x => x.id === faultId)
+      : FAULTS.find(x => x.id === faultId);
+
+    document.getElementById("dq-modal-title").textContent = isGrave
+      ? "⛔ Faute grave — Disqualification immédiate"
+      : "⚠️ 3ème faute (2ème avertissement)";
+
+    document.getElementById("dq-modal-text").innerHTML = isGrave
+      ? `<strong>${fullName(student)}</strong> a commis une <strong>faute grave</strong> : <em>${fObj ? fObj.label : ""}</em>.<br><br>L'arbitre confirme-t-il la <strong>disqualification immédiate</strong> pour cette rencontre ?`
+      : `<strong>${fullName(student)}</strong> atteint sa <strong>3ème faute</strong> (${fObj ? fObj.label : ""}), soit un 2ème avertissement.<br><br>L'arbitre confirme-t-il la fin de la rencontre par <strong>disqualification</strong> ?`;
+
+    document.getElementById("dq-modal").classList.add("open");
+    return;
+  }
+
+  state.currentMatch[faultTargetSide].events.push({ kind: "fault", faultId, isGrave: false });
+  saveState();
+  renderAssaut();
+  closeFaultModal();
+  const f = FAULTS.find(x => x.id === faultId);
+  if (currentFaults + 1 === 2) {
+    showToast(`⚠️ Avertissement pour ${faultTargetSide === "red" ? "Rouge" : "Bleu"} (2ème faute)`);
+  } else {
+    showToast(`Faute enregistrée : ${f ? f.label : ""}`);
+  }
+}
+
+function cancelDisqualification() {
+  pendingDQ = null;
+  document.getElementById("dq-modal").classList.remove("open");
+  showToast("Faute annulée. Vous pouvez relancer le chronomètre.");
+}
+
+function confirmDisqualification() {
+  if (!pendingDQ) return;
+  const { side, faultId, isGrave } = pendingDQ;
+  pendingDQ = null;
+  document.getElementById("dq-modal").classList.remove("open");
+
+  state.currentMatch[side].events.push({ kind: "fault", faultId, isGrave });
+  state.currentMatch[side].disqualified = true;
+  saveCurrentAssaut("disqualification");
+}
+
+function saveCurrentAssaut(endReason = "normal", extraName = "") {
+  if (isAssautLockedByRotationEnd()) return;
+  const rot = getActiveRotation();
+  if (!rot) return;
+
+  state.history.push({
+    id: Date.now(),
+    date: state.meta.date,
+    group: state.meta.group,
+    redId: rot.redId,
+    blueId: rot.blueId,
+    arbitre: rot.arbitre,
+    contreArbitre: rot.contreArbitre,
+    juges: rot.juges || [],
+    redName: fullName(getStudentById(rot.redId)),
+    blueName: fullName(getStudentById(rot.blueId)),
+    redScore: state.currentMatch.red.score,
+    blueScore: state.currentMatch.blue.score,
+    redDQ: !!state.currentMatch.red.disqualified,
+    blueDQ: !!state.currentMatch.blue.disqualified,
+    redSD: !!state.currentMatch.red.suddenDeathWin,
+    blueSD: !!state.currentMatch.blue.suddenDeathWin,
+    redEvents: JSON.parse(JSON.stringify(state.currentMatch.red.events)),
+    blueEvents: JSON.parse(JSON.stringify(state.currentMatch.blue.events))
+  });
+
+  state.currentMatch = createEmptyMatch();
+  if (state.customReplayMatch) {
+    state.customReplayMatch = null;
+  } else if (state.currentRotationIdx < state.rotations.length - 1) {
+    state.currentRotationIdx++;
+  } else {
+    state.rotationCompleted = true;
+  }
+
+  resetChrono();
+  saveState();
+  renderAssaut();
+  renderBilan();
+
+  if (state.rotationCompleted && !state.customReplayMatch) {
+    showToast("✅ Rotation des assauts terminée !\nConsultez le Bilan.");
+  } else if (endReason === "disqualification") {
+    showToast("⛔ Rencontre terminée par disqualification !");
+  } else if (endReason === "sudden_death") {
+    showToast(`💀 Victoire par mort subite pour ${extraName} !`);
+  } else {
+    showToast("✓ Assaut enregistré ! Rotation suivante prête.");
+  }
+}
+
+function nextRotation() {
+  if (isAssautLockedByRotationEnd()) {
+    showToast("✅ Rotation terminée !");
+    return;
+  }
+  if (!state.customReplayMatch && state.currentRotationIdx >= state.rotations.length - 1) {
+    showToast("Dernier assaut de la rotation atteint.");
+    return;
+  }
+  state.currentMatch = createEmptyMatch();
+  if (state.customReplayMatch) {
+    state.customReplayMatch = null;
+  } else {
+    state.currentRotationIdx++;
+  }
+  resetChrono();
+  saveState();
+  renderAssaut();
+  showToast(`Assaut ${state.currentRotationIdx + 1} chargé`);
+}
+
+function replayMatch(historyIdx) {
+  const m = state.history[historyIdx];
+  if (!m) return;
+  if (!confirm(`Rejouer la rencontre ${m.redName} vs ${m.blueName} ? L'ancien résultat sera remplacé.`)) {
+    return;
+  }
+  state.history.splice(historyIdx, 1);
+  state.customReplayMatch = {
+    redId: m.redId,
+    blueId: m.blueId,
+    arbitre: m.arbitre || null,
+    contreArbitre: m.contreArbitre || null,
+    juges: m.juges || []
+  };
+  state.currentMatch = createEmptyMatch();
+  resetChrono();
+  saveState();
+  switchView("assaut");
+  renderAssaut();
+  showToast("🔄 Rencontre prête à être rejouée !");
+}
+
+function renderGroupe() {
+  document.getElementById("meta-group").value = state.meta.group;
+  document.getElementById("meta-date").value = state.meta.date;
+  document.getElementById("meta-other").value = state.meta.other;
+
+  const list = document.getElementById("students-list");
+  list.innerHTML = state.students.map((s, idx) => `
+    <div class="student-row">
+      <div class="student-badge">${idx + 1}</div>
+      <input type="text" value="${s.prenom}" placeholder="Prénom / Élève ${idx + 1}" onchange="updateStudent(${idx}, 'prenom', this.value)">
+      <input type="text" value="${s.nom}" placeholder="Nom (optionnel)" onchange="updateStudent(${idx}, 'nom', this.value)">
+      <span style="font-size:0.8rem;color:var(--muted);">#${s.id}</span>
+    </div>
+  `).join("");
+
+  const tbody = document.getElementById("rotations-tbody");
+  tbody.innerHTML = state.rotations.map((r, i) => `
+    <tr style="${!state.customReplayMatch && !state.rotationCompleted && i === state.currentRotationIdx ? 'background:#eff6ff;' : ''}">
+      <td>#${i + 1}</td>
+      <td style="color:var(--red);font-weight:700;">${fullName(getStudentById(r.redId))}</td>
+      <td style="color:var(--blue);font-weight:700;">${fullName(getStudentById(r.blueId))}</td>
+      <td>${fullName(getStudentById(r.arbitre))}</td>
+      <td>${r.contreArbitre ? fullName(getStudentById(r.contreArbitre)) : "—"}</td>
+      <td>${r.juges.map(id => fullName(getStudentById(id))).join(", ") || "—"}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="loadRotation(${i})" ${state.rotationCompleted ? "disabled" : ""}>Charger</button></td>
+    </tr>
+  `).join("");
+}
+
+function updateStudent(idx, field, val) {
+  state.students[idx][field] = val;
+  saveState();
+}
+
+function loadRotation(idx) {
+  if (state.rotationCompleted) {
+    showToast("✅ Rotation terminée ! Passez par le Bilan pour rejouer un assaut.");
+    return;
+  }
+  state.customReplayMatch = null;
+  state.currentRotationIdx = idx;
+  state.currentMatch = createEmptyMatch();
+  resetChrono();
+  saveState();
+  switchView("assaut");
+  renderAssaut();
+}
+
+function renderConfigZoneCard(comboId) {
+  const c = TOUCH_COMBOS[comboId];
+  const cfg = state.config.combos[comboId];
+  const sd = state.config.suddenDeath;
+  const isSDTarget = sd.enabled && cfg.enabled && sd.comboId === comboId;
+
+  const sdPickBtn = (sd.enabled && cfg.enabled)
+    ? `<button class="cfg-sd-pick ${isSDTarget ? "selected" : ""}" onclick="event.stopPropagation(); setSDCombo('${comboId}')" title="Définir comme cible Mort subite">💀</button>`
+    : "";
+
+  return `
+    <div class="cfg-zone-card ${cfg.enabled ? "active" : ""} ${isSDTarget ? "sd-target" : ""}" onclick="toggleComboEnabled('${comboId}')">
+      ${sdPickBtn}
+      <span class="touch-tech">${isSDTarget ? "💀 " : ""}${c.label}</span>
+      <span class="touch-zone">${c.zoneLabel} — ${cfg.enabled ? "Activée" : "Masquée"}</span>
+      <div class="cfg-weight-row" onclick="event.stopPropagation()">
+        <button class="cfg-pm-btn" onclick="changeComboPts('${comboId}', -1)">−</button>
+        <span class="cfg-pts-val">${cfg.pts} pt${cfg.pts > 1 ? "s" : ""}</span>
+        <button class="cfg-pm-btn" onclick="changeComboPts('${comboId}', 1)">+</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderReglages() {
+  document.getElementById("input-duration").value = state.config.duration;
+
+  const sd = state.config.suddenDeath;
+  const sdBtn = document.getElementById("btn-toggle-sd");
+  sdBtn.textContent = sd.enabled ? "💀 Mode mort subite : ON" : "💀 Mode mort subite : OFF";
+  sdBtn.className = sd.enabled ? "btn btn-purple btn-sm" : "btn btn-outline btn-sm";
+
+  const sdControls = document.getElementById("sd-controls");
+  sdControls.style.display = sd.enabled ? "flex" : "none";
+  sdControls.classList.toggle("active", sd.enabled);
+  document.getElementById("sd-target-count").textContent = sd.targetHits;
+
+  document.getElementById("config-boxer-stage").innerHTML = `
+    <div class="boxer-bg">${getBoxerSVG("neutral")}</div>
+    <div class="zone-row zone-head">
+      ${renderConfigZoneCard("crochet_g")}
+      ${renderConfigZoneCard("direct_tete")}
+      ${renderConfigZoneCard("crochet_d")}
+    </div>
+    <div class="zone-row zone-mid">
+      ${renderConfigZoneCard("fouette_mediane")}
+      ${renderConfigZoneCard("direct_mediane")}
+      ${renderConfigZoneCard("chasse_mediane")}
+    </div>
+    <div class="zone-row zone-low">
+      ${renderConfigZoneCard("fouette_basse")}
+      <div></div>
+      ${renderConfigZoneCard("chasse_basse")}
+    </div>
+  `;
+
+  document.getElementById("config-faults").innerHTML = FAULTS.map(f => {
+    const on = !!state.config.faults[f.id];
+    return `
+      <label class="toggle-item ${on ? "on" : ""}">
+        <span>${f.label}</span>
+        <input type="checkbox" ${on ? "checked" : ""} onchange="toggleFaultConfig('faults','${f.id}',this.checked)">
+      </label>
+    `;
+  }).join("");
+
+  document.getElementById("config-grave-faults").innerHTML = GRAVE_FAULTS.map(f => {
+    const on = !!state.config.graveFaults[f.id];
+    return `
+      <label class="toggle-item grave ${on ? "on" : ""}">
+        <span>${f.label}</span>
+        <input type="checkbox" ${on ? "checked" : ""} onchange="toggleFaultConfig('graveFaults','${f.id}',this.checked)">
+      </label>
+    `;
+  }).join("");
+}
+
+function toggleComboEnabled(comboId) {
+  const cfg = state.config.combos[comboId];
+  cfg.enabled = !cfg.enabled;
+  if (!cfg.enabled && state.config.suddenDeath.comboId === comboId) {
+    const firstActive = Object.keys(state.config.combos).find(k => state.config.combos[k].enabled);
+    if (firstActive) state.config.suddenDeath.comboId = firstActive;
+  }
+  saveState();
+  renderReglages();
+  renderAssaut();
+}
+
+function changeComboPts(comboId, delta) {
+  const cfg = state.config.combos[comboId];
+  cfg.pts = Math.max(1, Math.min(10, cfg.pts + delta));
+  saveState();
+  renderReglages();
+  renderAssaut();
+}
+
+function toggleSuddenDeath() {
+  state.config.suddenDeath.enabled = !state.config.suddenDeath.enabled;
+  if (state.config.suddenDeath.enabled) {
+    const cur = state.config.suddenDeath.comboId;
+    if (!state.config.combos[cur] || !state.config.combos[cur].enabled) {
+      const firstActive = Object.keys(state.config.combos).find(k => state.config.combos[k].enabled);
+      if (firstActive) state.config.suddenDeath.comboId = firstActive;
+    }
+  }
+  saveState();
+  renderReglages();
+  renderAssaut();
+}
+
+function setSDCombo(comboId) {
+  state.config.suddenDeath.comboId = comboId;
+  saveState();
+  renderReglages();
+  renderAssaut();
+  showToast(`💀 Cible Mort subite : ${TOUCH_COMBOS[comboId].label} (${TOUCH_COMBOS[comboId].zoneLabel})`);
+}
+
+function changeSDTargetCount(delta) {
+  state.config.suddenDeath.targetHits = Math.max(1, Math.min(10, state.config.suddenDeath.targetHits + delta));
+  saveState();
+  renderReglages();
+  renderAssaut();
+}
+
+function toggleFaultConfig(group, key, checked) {
+  state.config[group][key] = checked;
+  saveState();
+  renderReglages();
+}
+
+function setDuration(sec) {
+  state.config.duration = sec;
+  document.getElementById("input-duration").value = sec;
+  resetChrono();
+  saveState();
+  showToast(`Reprise réglée sur ${formatTime(sec)}`);
+}
+
+function computeStudentStats() {
+  const stats = {};
+  state.students.forEach(s => {
+    stats[s.id] = {
+      name: fullName(s),
+      assauts: 0,
+      score: 0,
+      faults: 0,
+      hasDQ: false,
+      hasSDWin: false,
+      tech: { direct: 0, crochet: 0, chasse: 0, fouette: 0 },
+      zone: { basse: 0, mediane: 0, tete: 0 }
+    };
+  });
+
+  state.history.forEach(m => {
+    [
+      { id: m.redId, score: m.redScore, events: m.redEvents, dq: m.redDQ, sd: m.redSD },
+      { id: m.blueId, score: m.blueScore, events: m.blueEvents, dq: m.blueDQ, sd: m.blueSD }
+    ].forEach(side => {
+      const st = stats[side.id];
+      if (!st) return;
+      st.assauts++;
+      st.score += side.score;
+      if (side.dq) st.hasDQ = true;
+      if (side.sd) st.hasSDWin = true;
+      side.events.forEach(e => {
+        if (e.kind === "fault") st.faults++;
+        if (e.kind === "touch") {
+          if (st.tech[e.tech] !== undefined) st.tech[e.tech]++;
+          if (st.zone[e.zone] !== undefined) st.zone[e.zone]++;
+        }
+      });
+    });
+  });
+
+  return Object.values(stats);
+}
+
+function renderBilan() {
+  const rows = computeStudentStats();
+  const activeTechSet = new Set(
+    Object.values(TOUCH_COMBOS)
+      .filter(c => state.config.combos[c.id] && state.config.combos[c.id].enabled)
+      .map(c => c.tech)
+  );
+  const activeTechIds = Array.from(activeTechSet);
+
+  document.getElementById("summary-tbody").innerHTML = rows.map(r => {
+    const usedAll = activeTechIds.length > 0 && activeTechIds.every(tid => r.tech[tid] > 0);
+    const hasPoing = (r.tech.direct + r.tech.crochet) > 0;
+    const hasPied = (r.tech.chasse + r.tech.fouette) > 0;
+    const varieteHtml = usedAll
+      ? `<span class="pill-ok">✓ Toutes utilisées</span>`
+      : (hasPoing && hasPied)
+        ? `<span class="pill-ok">Pieds + Poings</span>`
+        : `<span class="pill-no">Incomplet</span>`;
+
+    const scoreCell = r.hasSDWin
+      ? `<span class="sd-score" title="Victoire par mort subite">💀 ${r.score}</span>`
+      : `<strong>${r.score}</strong>`;
+
+    const faultCell = r.hasDQ
+      ? `<span class="dq-fault" title="Disqualifié sur au moins une rencontre">⚠️ ${r.faults}</span>`
+      : `<span class="fault-yellow-pill">${r.faults}</span>`;
+
+    return `
+      <tr>
+        <td>${r.name}</td>
+        <td>${r.assauts}</td>
+        <td>${scoreCell}</td>
+        <td>${faultCell}</td>
+        <td>${r.tech.direct}</td>
+        <td>${r.tech.crochet}</td>
+        <td>${r.tech.chasse}</td>
+        <td>${r.tech.fouette}</td>
+        <td>${r.zone.basse}</td>
+        <td>${r.zone.mediane}</td>
+        <td>${r.zone.tete}</td>
+        <td>${varieteHtml}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const histEl = document.getElementById("history-tbody");
+  if (state.history.length === 0) {
+    histEl.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);">Aucun assaut enregistré pour le moment.</td></tr>`;
+  } else {
+    histEl.innerHTML = state.history.map((m, idx) => {
+      const rf = m.redEvents.filter(e => e.kind === "fault").length;
+      const bf = m.blueEvents.filter(e => e.kind === "fault").length;
+      const rfHtml = m.redDQ ? `<span class="dq-fault">⚠️ ${rf} (DQ)</span>` : `${rf}`;
+      const bfHtml = m.blueDQ ? `<span class="dq-fault">⚠️ ${bf} (DQ)</span>` : `${bf}`;
+      const rsHtml = m.redSD ? `<span class="sd-score">💀 ${m.redScore}</span>` : `<strong>${m.redScore}</strong>`;
+      const bsHtml = m.blueSD ? `<span class="sd-score">💀 ${m.blueScore}</span>` : `<strong>${m.blueScore}</strong>`;
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td style="color:var(--red);font-weight:700;">${m.redName}</td>
+          <td>${rsHtml}</td>
+          <td style="color:var(--blue);font-weight:700;">${m.blueName}</td>
+          <td>${bsHtml}</td>
+          <td>${rfHtml} / ${bfHtml}</td>
+          <td>${m.redEvents.filter(e => e.kind === "touch").length} t. / ${m.blueEvents.filter(e => e.kind === "touch").length} t.</td>
+          <td><button class="btn btn-outline btn-sm" onclick="replayMatch(${idx})">🔄 Rejouer</button></td>
+        </tr>
+      `;
+    }).join("");
+  }
+}
+
+function exportCSV() {
+  const rows = computeStudentStats();
+  const header = ["Groupe", "Date", "Info", "Eleve", "Assauts", "Score Total", "Mort Subite", "Fautes", "Disqualification", "Direct", "Crochet", "Chasse", "Fouette", "Zone Basse", "Zone Mediane", "Zone Tete"];
+  const lines = [header.join(";")];
+  rows.forEach(r => {
+    lines.push([
+      state.meta.group, state.meta.date, state.meta.other, r.name,
+      r.assauts, r.score, r.hasSDWin ? "OUI" : "NON", r.faults, r.hasDQ ? "OUI" : "NON",
+      r.tech.direct, r.tech.crochet, r.tech.chasse, r.tech.fouette,
+      r.zone.basse, r.zone.mediane, r.zone.tete
+    ].join(";"));
+  });
+  const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `savate_${state.meta.group.replace(/\s+/g, "_")}_${state.meta.date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function switchView(viewName) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById(`view-${viewName}`).classList.add("active");
+  document.querySelector(`.nav-btn[data-view="${viewName}"]`).classList.add("active");
+
+  if (viewName === "assaut") renderAssaut();
+  if (viewName === "groupe") renderGroupe();
+  if (viewName === "reglages") renderReglages();
+  if (viewName === "bilan") renderBilan();
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerHTML = msg.replace(/\n/g, "<br>");
+  t.classList.add("show");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchView(btn.dataset.view));
+});
+
+document.getElementById("btn-chrono-toggle").addEventListener("click", toggleChrono);
+document.getElementById("btn-chrono-reset").addEventListener("click", resetChrono);
+document.getElementById("btn-chrono-extra").addEventListener("click", addExtraTime10s);
+document.getElementById("btn-save-assaut").addEventListener("click", () => saveCurrentAssaut("normal"));
+document.getElementById("btn-next-rotation").addEventListener("click", nextRotation);
+document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
+document.getElementById("btn-toggle-sd").addEventListener("click", toggleSuddenDeath);
+
+document.getElementById("meta-group").addEventListener("input", e => { state.meta.group = e.target.value; saveState(); });
+document.getElementById("meta-date").addEventListener("input", e => { state.meta.date = e.target.value; saveState(); });
+document.getElementById("meta-other").addEventListener("input", e => { state.meta.other = e.target.value; saveState(); });
+
+document.getElementById("input-duration").addEventListener("change", e => {
+  const v = Math.max(15, Math.min(300, parseInt(e.target.value, 10) || 90));
+  setDuration(v);
+});
+
+document.getElementById("btn-add-student").addEventListener("click", () => {
+  if (state.students.length >= 6) {
+    showToast("Maximum 6 élèves par enceinte");
+    return;
+  }
+  const nextId = Math.max(0, ...state.students.map(s => s.id)) + 1;
+  state.students.push({ id: nextId, prenom: `Élève ${nextId}`, nom: "" });
+  saveState();
+  renderGroupe();
+});
+
+document.getElementById("btn-remove-student").addEventListener("click", () => {
+  if (state.students.length <= 4) {
+    showToast("Minimum 4 élèves par enceinte");
+    return;
+  }
+  state.students.pop();
+  saveState();
+  renderGroupe();
+});
+
+document.getElementById("btn-apply-students").addEventListener("click", () => {
+  state.rotations = generateRotations(state.students);
+  state.currentRotationIdx = 0;
+  state.rotationCompleted = false;
+  state.customReplayMatch = null;
+  state.currentMatch = createEmptyMatch();
+  resetChrono();
+  saveState();
+  renderGroupe();
+  renderAssaut();
+  showToast("Rotations équilibrées générées !");
+});
+
+document.getElementById("btn-reset-all").addEventListener("click", () => {
+  if (confirm("Effacer l'historique et réinitialiser toute la séance ?")) {
+    localStorage.removeItem(STORAGE_KEY);
+    state = getDefaultState();
+    state.rotations = generateRotations(state.students);
+    resetChrono();
+    saveState();
+    renderReglages();
+    renderAssaut();
+    renderBilan();
+    showToast("Séance réinitialisée");
+  }
+});
+
+updateChronoUI();
+renderAssaut();
+</script>
+</body>
+</html>
