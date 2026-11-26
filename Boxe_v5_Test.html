@@ -1,17 +1,3 @@
-Voici la version mise à jour et vérifiée (syntaxe JavaScript et correspondance des identifiants HTML contrôlées) intégrant l'ensemble de vos nouvelles demandes.
-
-## Modifications apportées
-
-- **Fin de rotation verrouillée** : dès que le dernier assaut de la rotation est validé, le compteur passe en **vert** (`✓ Assauts terminés`), un bandeau vert s'affiche en haut de l'écran Assaut et il n'est plus possible de relancer le chronomètre ni un nouvel assaut sans réinitialiser la séance (ou rejouer un assaut précis depuis l'onglet **Bilan**).
-- **Bouton « +10s Extra » sur le chronomètre** : permet aux élèves d'ajouter instantanément 10 secondes de temps additionnel à la reprise en cours (ou de débloquer une reprise tout juste terminée pour jouer les 10 secondes supplémentaires).
-- **Bilan — Fautes en jaune** : dans le tableau récapitulatif, la colonne **Fautes** (en-tête et valeurs) apparaît en **jaune**, tout en conservant le surlignage rouge avec `⚠️` en cas de disqualification.
-- **Bilan — Encadrés « Techniques » et « Zones de touches »** : le tableau récapitulatif affiche désormais un encadré bleu **Techniques** au-dessus de *Direct, Crochet, Chassé, Fouetté* et un encadré vert **Zones de touches** au-dessus de *Basse, Médiane, Tête* (le libellé *Front* étant conservé sur la page Assaut).
-
-## Code source autonome mis à jour
-
-Remplacez le contenu de votre fichier `savate-eps.html` par le code ci-dessous :
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1652,7 +1638,7 @@ function generateRotations(students) {
     } else if (n === 5) {
       juges = rotated.slice(1, 3);
     } else if (n >= 6) {
-      contreArbitre = rotated [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/164095965/3cbd6c3d-275d-4a53-b9d2-296ec2108f55/image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Checksum-Mode=ENABLED&X-Amz-Credential=ASIA2F3EMEYE6GK3OJGL%2F20261125%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261125T185954Z&X-Amz-Expires=2434&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIQDh5DemoKJiiKmwmEYvMeZBFF8j0Rfwv8FaH4OIfoHFGwIgE8UM6PdqdDX9s2nw7Ib0P8xi7Nvrn3FGnXrMAzIu4f0qiQUIq%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgw2OTk3NTMzMDk3MDUiDEdGltjJDeFIOfxliCrdBGy%2BbPzeNWLM8mt2i7Fvxf%2BMj%2FCXLM6p2sOGQxpc1bOuHmtkFDMfMj4Try7S7a7sWkvUI7rVDWfcPSqsafHLfzzU4bgI3QBzu4lNhPv4ZYwk1GKfwU5tJQOJTyairBIonI6FPMAq%2BR0LHr0DbiM6x6%2FHoVKx%2BPT8%2B27tMiWet7iooK%2BSYRjrsLXppjPJP6lL4t5zyHrVa6oNlfgMWCBN%2BNirk2x%2F1ak%2BtgABy0p%2BHUIpe%2BUFBR6CSWmKjfdyCfoGEDn3slx1AeuX7dtD902DUUnqmAPZb%2F%2BRqvHqcOmUTL7I%2BfykrhLEaHrp0nY11AuMvnRGmAhzAccQ%2FnqQRUFfuWxFICSjPUZ8SHyz4Ss77UF0DRO4vspeils6VoS8Hp8fPnCiFY50UXjVK1qG601KYNUvqcPVnFDMLLotJYB8m1n1ZiDyXgdYjGiyJX%2FWaksX0lF%2BbueyOCiDlNdrMJny%2Fqsv9Aw%2FfWwk9lJDtdZ8rdeZdpfVuau68YiPlZLaZSgy9xVh%2FfYffdDhZ0w1FGoBxx%2BVOOxFOOddHHG5Hruou35fbYp2DBTdHPdArcYJ1ZLRCfF6vYxm84qxBbfcCQP4MzCETU6xcRQiHm1RBvQqL%2Fe8GtWP9pwJlv24l0JYfC8BBuJ4le7UvHSEjvON8NRTVFTw7GdPFSGR3seTA0%2Bjce%2BzpVhVoKFwEzjuEuQd%2FDJeqnP60LgtFN5PCDhkWDd%2Bmzv3w6VDjDDT5IiomRcvs0twxiDqCLI%2F02soKDkNnZ655sz8iq8bHu1bIrjDbm7zuSf3VQal7TsyklQOXtw9MNnXnNgGOpgBREwfGduznpq8zDQ1hZQ2QKEKUY8A5HZkmM%2B6cKQO8%2FW8RYXYxEs%2B73Wu%2BE93rDtE4BlOGiiOvi60Sv%2Bho6O54uKHHEN6liIZYnTqr7OnZIMiqUyu9jQHBgDhhhwyY4upEPeprxgXwJH7eGPIUdX55FNC19mo9Uoss%2Ff2WEIN%2F86oNJIgtpDscOuwzzqWB7o2%2BPXsnd2Hy08%3D&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=60ee996b0cfc4b4c5addddbf9608e5299e1a1e3e0f238f9480921e687948f90d) || null;
+      contreArbitre = rotated[1] || null;
       juges = rotated.slice(2, 4);
     }
 
